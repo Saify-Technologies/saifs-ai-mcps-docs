@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/customer-intelligence",
+  "title": "Customer Intelligence & Segmentation",
+  "description": "Segment customers into A/B/C/D tiers, flag at-risk accounts and build a daily sales call list.",
+  "version": "1.0.2",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/saifs-ai/mcp",
+    "source": "github",
+    "subfolder": "servers/customer-intelligence"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://customer-tiering-mcp-latest.saifs.ai/mcp"
+    }
+  ]
+}

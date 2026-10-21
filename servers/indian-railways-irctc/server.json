@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/indian-railways-irctc",
+  "title": "Indian Railways IRCTC",
+  "description": "Look up Indian Railways trains, routes, live running status, station boards and PNR status.",
+  "version": "1.0.1",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/saifs-ai/mcp",
+    "source": "github",
+    "subfolder": "servers/indian-railways-irctc"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://transport-agent-claude.saifs.ai/mcp"
+    }
+  ]
+}

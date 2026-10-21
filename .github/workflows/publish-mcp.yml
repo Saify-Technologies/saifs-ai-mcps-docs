@@ -1,0 +1,50 @@
+name: Publish to MCP Registry
+
+# Validates every servers/*/server.json on each push/PR.
+# Publishes to registry.modelcontextprotocol.io when run manually or on a v* tag.
+# Remember: bump "version" in a server.json before publishing it again.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      server:
+        description: "Folder under servers/ to publish (leave empty for all)"
+        required: false
+        default: ""
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mcp-publisher
+        run: |
+          curl -sL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          ./mcp-publisher --help > /dev/null
+
+      - name: Check JSON
+        run: for f in servers/*/server.json; do jq empty "$f" && echo "ok $f"; done
+
+      - name: Log in (DNS auth for ai.saifs)
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          MCP_DNS_PRIVATE_KEY: ${{ secrets.MCP_DNS_PRIVATE_KEY }}
+        run: ./mcp-publisher login dns --domain saifs.ai --private-key "$MCP_DNS_PRIVATE_KEY"
+
+      - name: Publish
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          ONLY: ${{ github.event.inputs.server }}
+        run: |
+          for dir in servers/*/; do
+            name=$(basename "$dir")
+            if [ -n "$ONLY" ] && [ "$ONLY" != "$name" ]; then continue; fi
+            echo "::group::$name"
+            ./mcp-publisher publish "$dir/server.json"
+            echo "::endgroup::"
+          done

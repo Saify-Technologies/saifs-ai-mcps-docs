@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/marketing-intelligence",
+  "title": "Marketing Intelligence & Optimization",
+  "description": "Channel ROI and budget mix, product bundles, A/B test verdicts and CAC/LTV from marketing data.",
+  "version": "1.0.1",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/saifs-ai/mcp",
+    "source": "github",
+    "subfolder": "servers/marketing-intelligence"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://marketing-analysis-mcp.saifs.ai/mcp"
+    }
+  ]
+}

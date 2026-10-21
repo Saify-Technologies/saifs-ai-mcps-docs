@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/lead-intelligence",
+  "title": "Lead Intelligence",
+  "description": "Score leads to identify high-potential prospects and prioritize sales outreach.",
+  "version": "1.0.1",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/saifs-ai/mcp",
+    "source": "github",
+    "subfolder": "servers/lead-intelligence"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://lead-scoring-mcp.saifs.ai/mcp"
+    }
+  ]
+}
