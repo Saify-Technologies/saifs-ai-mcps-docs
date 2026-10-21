@@ -64,5 +64,5 @@ Point it at `https://customer-tiering-mcp-latest.saifs.ai/mcp` using the Streama
 ## Support
 
 - Website: https://saifs.ai
-- Issues: https://github.com/saifs-ai/mcp/issues
+- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
 - Privacy: https://saifs.ai/privacy_policy

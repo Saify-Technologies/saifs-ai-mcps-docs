@@ -25,7 +25,7 @@ All 9 are remote Streamable HTTP servers, `active` / `isLatest` in the official 
 | Indian Railways IRCTC | `ai.saifs/indian-railways-irctc` | 1.0.1 | `https://transport-agent-claude.saifs.ai/mcp` | Look up Indian Railways trains, routes, live running status, station boards and PNR status. |
 
 - **Publisher:** SAIFS AI — https://saifs.ai
-- **Repository:** https://github.com/saifs-ai/mcp (one folder per server: README, tool list, VS Code `mcp.json`, `server.json`; each `server.json` links its folder via `repository.subfolder`)
+- **Repository:** https://github.com/Saify-Technologies/saifs-ai-mcps-docs (one folder per server: README, tool list, VS Code `mcp.json`, `server.json`; each `server.json` links its folder via `repository.subfolder`)
 - **Auth:** OAuth 2.1 on every server — unauthenticated requests return `401` with `WWW-Authenticate: Bearer` and an RFC 9728 `resource_metadata` pointer; dynamic client registration and PKCE S256
 - **Privacy:** https://saifs.ai/privacy_policy
 
@@ -52,8 +52,8 @@ We'd like to request onboarding of SAIFS AI's nine hosted MCP servers to github.
 published and active in the official MCP Registry under our DNS-verified `ai.saifs` namespace, and we
 publish new versions there, so they will stay in sync once onboarded.
 
-- Servers and endpoints: see the table at https://github.com/saifs-ai/mcp#readme
-- Public listing repository: https://github.com/saifs-ai/mcp
+- Servers and endpoints: see the table at https://github.com/Saify-Technologies/saifs-ai-mcps-docs#readme
+- Public listing repository: https://github.com/Saify-Technologies/saifs-ai-mcps-docs
 - Auth: OAuth 2.1 with dynamic client registration and PKCE on every server
 - Onboarding comment: <link to your comment on discussion #1257>
 

@@ -35,7 +35,7 @@ official MCP Registry by [`.github/workflows/publish-mcp.yml`](.github/workflows
 
 ## Support
 
-Open an [issue](https://github.com/saifs-ai/mcp/issues) or visit https://saifs.ai.
+Open an [issue](https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues) or visit https://saifs.ai.
 
 ## License
 

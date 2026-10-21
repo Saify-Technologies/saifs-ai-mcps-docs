@@ -64,5 +64,5 @@ Point it at `https://inventory-optimizer-mcp.saifs.ai/mcp` using the Streamable 
 ## Support
 
 - Website: https://saifs.ai
-- Issues: https://github.com/saifs-ai/mcp/issues
+- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
 - Privacy: https://saifs.ai/privacy_policy

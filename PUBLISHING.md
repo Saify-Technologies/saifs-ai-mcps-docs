@@ -4,7 +4,7 @@ Do these in order. Total time: about an hour.
 
 ## 1. Check the repo address
 
-This kit assumes `https://github.com/saifs-ai/mcp`. If yours differs, find-and-replace it in every
+This kit assumes `https://github.com/Saify-Technologies/saifs-ai-mcps-docs`. If yours differs, find-and-replace it in every
 `server.json`, every `README.md` and `ONBOARDING.md`.
 
 ## 2. Create the repo on GitHub
@@ -15,7 +15,7 @@ Create a **public** repository (for example `saifs-ai/mcp`), then from this fold
 git init -b main
 git add .
 git commit -m "Public listing for SAIFS AI MCP servers"
-git remote add origin https://github.com/saifs-ai/mcp.git
+git remote add origin https://github.com/Saify-Technologies/saifs-ai-mcps-docs.git
 git push -u origin main
 ```
 

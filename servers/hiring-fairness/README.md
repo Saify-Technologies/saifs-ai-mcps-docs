@@ -64,5 +64,5 @@ Point it at `https://hiring-fairness-mcp.saifs.ai/mcp` using the Streamable HTTP
 ## Support
 
 - Website: https://saifs.ai
-- Issues: https://github.com/saifs-ai/mcp/issues
+- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
 - Privacy: https://saifs.ai/privacy_policy
