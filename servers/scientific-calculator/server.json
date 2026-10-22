@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/scientific-calculator",
+  "title": "Scientific Calculator",
+  "description": "Exact arithmetic, algebra, calculus, physics, chemistry and finance with a checkable formula.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/scientific-calculator"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://scientific-calculator-mcp.saifs.ai/mcp"
+    }
+  ]
+}

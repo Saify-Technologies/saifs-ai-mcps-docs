@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/learning-optimizer",
+  "title": "Learning Optimizer",
+  "description": "Schedule spaced reviews and exam study plans from each learner's forgetting curve.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/learning-optimizer"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://learning-optimizer-mcp.saifs.ai/mcp"
+    }
+  ]
+}

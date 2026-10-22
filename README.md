@@ -1,8 +1,9 @@
 # SAIFS AI — MCP servers
 
 Hosted [Model Context Protocol](https://modelcontextprotocol.io) servers from [SAIFS AI](https://saifs.ai) for sales,
-inventory, marketing, HR, media generation and travel. Every server is remote (Streamable HTTP) with
-OAuth 2.1 sign-in, so there is nothing to install — add the URL to any MCP client.
+inventory, marketing, HR, education, logistics, collections, procurement, media generation and travel.
+Every server is remote (Streamable HTTP) with OAuth 2.1 sign-in, so there is nothing to install — add
+the URL to any MCP client.
 
 All servers are published in the [official MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.saifs)
 under the DNS-verified `ai.saifs` namespace.
@@ -18,6 +19,14 @@ under the DNS-verified `ai.saifs` namespace.
 | [Media Generator — Images, Videos & Audios](servers/media-generator-images-videos) | `ai.saifs/media-generator-images-videos` | Generate marketing images, logos, videos, music and speech for campaigns, products and brand assets. |
 | [Synthetic Data — Random User](servers/synthetic-data-random-user) | `ai.saifs/synthetic-data-random-user` | Generate synthetic user data for testing, demos and development without real personal data. |
 | [Indian Railways IRCTC](servers/indian-railways-irctc) | `ai.saifs/indian-railways-irctc` | Look up Indian Railways trains, routes, live running status, station boards and PNR status. |
+| [Scientific Calculator](servers/scientific-calculator) | `ai.saifs/scientific-calculator` | Exact arithmetic, algebra, calculus, physics, chemistry and finance with a checkable formula. |
+| [Procurement & Supplier Selection](servers/procurement-and-supplier-selection) | `ai.saifs/procurement-and-supplier-selection` | Choose and rank suppliers, size orders and classify spend from delivery and purchase data. |
+| [Learning Optimizer](servers/learning-optimizer) | `ai.saifs/learning-optimizer` | Schedule spaced reviews and exam study plans from each learner's forgetting curve. |
+| [Route & Logistics Optimizer](servers/route-optimizer) | `ai.saifs/route-optimizer` | Plan vehicle routes, job assignments and load packing from stops, fleet and constraints. |
+| [Assessment Intelligence](servers/assessment-intelligence) | `ai.saifs/assessment-intelligence` | Analyse tests for item quality, true ability, reliability and learner mastery. |
+| [Mathematical Code Execution](servers/code-execution) | `ai.saifs/code-execution` | Run sandboxed Python for calculations and PDFs; no other languages, installs or network. |
+| [Collections Optimizer](servers/collections-optimizer) | `ai.saifs/collections-optimizer` | Prioritise overdue accounts by recovery uplift and recommend a compliant contact strategy. |
+| [Mastery Pathing](servers/mastery-pathing) | `ai.saifs/mastery-pathing` | Map prerequisites, track mastery and recommend the next topic each learner is ready for. |
 
 ## Quick start
 

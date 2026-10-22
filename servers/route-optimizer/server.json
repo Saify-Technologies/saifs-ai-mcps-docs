@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/route-optimizer",
+  "title": "Route & Logistics Optimizer",
+  "description": "Plan vehicle routes, job assignments and load packing from stops, fleet and constraints.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/route-optimizer"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://route-optimizer-mcp.saifs.ai/mcp"
+    }
+  ]
+}

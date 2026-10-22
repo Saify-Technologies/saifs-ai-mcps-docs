@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/mastery-pathing",
+  "title": "Mastery Pathing",
+  "description": "Map prerequisites, track mastery and recommend the next topic each learner is ready for.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/mastery-pathing"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mastery-pathing-mcp.saifs.ai/mcp"
+    }
+  ]
+}
