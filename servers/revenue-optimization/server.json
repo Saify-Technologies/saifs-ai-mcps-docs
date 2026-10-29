@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/revenue-optimization",
+  "title": "Dynamic Pricing & Overbooking",
+  "description": "Set prices, protection levels and overbooking limits from demand and remaining capacity.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/revenue-optimization"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp"
+    }
+  ]
+}

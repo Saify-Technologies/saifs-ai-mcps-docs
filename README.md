@@ -1,7 +1,7 @@
 # SAIFS AI — MCP servers
 
 Hosted [Model Context Protocol](https://modelcontextprotocol.io) servers from [SAIFS AI](https://saifs.ai) for sales,
-inventory, marketing, HR, education, logistics, collections, procurement, media generation and travel.
+inventory, marketing, HR, education, logistics, collections, procurement, finance, operations, media generation and travel.
 Every server is remote (Streamable HTTP) with OAuth 2.1 sign-in, so there is nothing to install — add
 the URL to any MCP client.
 
@@ -27,6 +27,10 @@ under the DNS-verified `ai.saifs` namespace.
 | [Mathematical Code Execution](servers/code-execution) | `ai.saifs/code-execution` | Run sandboxed Python for calculations and PDFs; no other languages, installs or network. |
 | [Collections Optimizer](servers/collections-optimizer) | `ai.saifs/collections-optimizer` | Prioritise overdue accounts by recovery uplift and recommend a compliant contact strategy. |
 | [Mastery Pathing](servers/mastery-pathing) | `ai.saifs/mastery-pathing` | Map prerequisites, track mastery and recommend the next topic each learner is ready for. |
+| [Payment Reconciliation & Matching](servers/payment-reconciliation) | `ai.saifs/payment-reconciliation` | Match bank receipts and payments to invoices with confidence, deductions and exceptions. |
+| [Statistical Process Control & Anomaly Alerts](servers/process-control) | `ai.saifs/process-control` | Monitor metric streams with control charts and alert only on statistically real drift. |
+| [Dynamic Pricing & Overbooking](servers/revenue-optimization) | `ai.saifs/revenue-optimization` | Set prices, protection levels and overbooking limits from demand and remaining capacity. |
+| [Optimization Solver (LP / MIP Scheduling)](servers/optimization-solver) | `ai.saifs/optimization-solver` | Solve production, blending, transport and scheduling problems with LP and MIP. |
 
 ## Quick start
 

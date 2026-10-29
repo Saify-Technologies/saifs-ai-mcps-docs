@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/process-control",
+  "title": "Statistical Process Control & Anomaly Alerts",
+  "description": "Monitor metric streams with control charts and alert only on statistically real drift.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/process-control"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://process-monitor-mcp-microsoft.saifs.ai/mcp"
+    }
+  ]
+}
