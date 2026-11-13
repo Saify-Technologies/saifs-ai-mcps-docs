@@ -5,7 +5,7 @@ Yield-management math over booking, capacity and price data for perishable capac
 | | |
 |---|---|
 | **Registry name** | `ai.saifs/revenue-optimization` |
-| **Endpoint** | `https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp` |
+| **Endpoint** | `https://revenue-optimizer-mcp.saifs.ai/mcp` |
 | **Transport** | Streamable HTTP (remote, nothing to install) |
 | **Auth** | OAuth 2.1 — PKCE (S256) and dynamic client registration; your client opens a sign-in page on first use |
 | **Publisher** | [SAIFS AI](https://saifs.ai) |
@@ -21,7 +21,7 @@ Add to `.vscode/mcp.json` (workspace) or your user `mcp.json`:
   "servers": {
     "saifs-revenue-optimization": {
       "type": "http",
-      "url": "https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp"
+      "url": "https://revenue-optimizer-mcp.saifs.ai/mcp"
     }
   }
 }
@@ -34,18 +34,18 @@ Then start the server from the MCP view and sign in when prompted.
 Settings → Connectors → **Add custom connector**, and paste:
 
 ```
-https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp
+https://revenue-optimizer-mcp.saifs.ai/mcp
 ```
 
 ### Claude Code
 
 ```bash
-claude mcp add --transport http saifs-revenue-optimization https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp
+claude mcp add --transport http saifs-revenue-optimization https://revenue-optimizer-mcp.saifs.ai/mcp
 ```
 
 ### Any other MCP client
 
-Point it at `https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp` using the Streamable HTTP transport. The server returns `401` with a
+Point it at `https://revenue-optimizer-mcp.saifs.ai/mcp` using the Streamable HTTP transport. The server returns `401` with a
 `WWW-Authenticate: Bearer … resource_metadata=…` challenge, so OAuth-aware clients sign in automatically.
 
 ## Tools

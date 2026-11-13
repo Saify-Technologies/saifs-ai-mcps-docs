@@ -5,7 +5,7 @@ Continuous statistical monitoring of any metric stream — support response time
 | | |
 |---|---|
 | **Registry name** | `ai.saifs/process-control` |
-| **Endpoint** | `https://process-monitor-mcp-microsoft.saifs.ai/mcp` |
+| **Endpoint** | `https://process-monitor-mcp.saifs.ai/mcp` |
 | **Transport** | Streamable HTTP (remote, nothing to install) |
 | **Auth** | OAuth 2.1 — PKCE (S256) and dynamic client registration; your client opens a sign-in page on first use |
 | **Publisher** | [SAIFS AI](https://saifs.ai) |
@@ -21,7 +21,7 @@ Add to `.vscode/mcp.json` (workspace) or your user `mcp.json`:
   "servers": {
     "saifs-process-control": {
       "type": "http",
-      "url": "https://process-monitor-mcp-microsoft.saifs.ai/mcp"
+      "url": "https://process-monitor-mcp.saifs.ai/mcp"
     }
   }
 }
@@ -34,18 +34,18 @@ Then start the server from the MCP view and sign in when prompted.
 Settings → Connectors → **Add custom connector**, and paste:
 
 ```
-https://process-monitor-mcp-microsoft.saifs.ai/mcp
+https://process-monitor-mcp.saifs.ai/mcp
 ```
 
 ### Claude Code
 
 ```bash
-claude mcp add --transport http saifs-process-control https://process-monitor-mcp-microsoft.saifs.ai/mcp
+claude mcp add --transport http saifs-process-control https://process-monitor-mcp.saifs.ai/mcp
 ```
 
 ### Any other MCP client
 
-Point it at `https://process-monitor-mcp-microsoft.saifs.ai/mcp` using the Streamable HTTP transport. The server returns `401` with a
+Point it at `https://process-monitor-mcp.saifs.ai/mcp` using the Streamable HTTP transport. The server returns `401` with a
 `WWW-Authenticate: Bearer … resource_metadata=…` challenge, so OAuth-aware clients sign in automatically.
 
 ## Tools

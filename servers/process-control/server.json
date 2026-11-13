@@ -3,7 +3,7 @@
   "name": "ai.saifs/process-control",
   "title": "Statistical Process Control & Anomaly Alerts",
   "description": "Monitor metric streams with control charts and alert only on statistically real drift.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://saifs.ai",
   "repository": {
     "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
@@ -13,7 +13,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://process-monitor-mcp-microsoft.saifs.ai/mcp"
+      "url": "https://process-monitor-mcp.saifs.ai/mcp"
     }
   ]
 }

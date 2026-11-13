@@ -3,7 +3,7 @@
   "name": "ai.saifs/revenue-optimization",
   "title": "Dynamic Pricing & Overbooking",
   "description": "Set prices, protection levels and overbooking limits from demand and remaining capacity.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://saifs.ai",
   "repository": {
     "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
@@ -13,7 +13,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://revenue-optimizer-mcp-microsoft.saifs.ai/mcp"
+      "url": "https://revenue-optimizer-mcp.saifs.ai/mcp"
     }
   ]
 }

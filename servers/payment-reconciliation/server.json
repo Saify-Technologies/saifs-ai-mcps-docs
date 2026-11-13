@@ -3,7 +3,7 @@
   "name": "ai.saifs/payment-reconciliation",
   "title": "Payment Reconciliation & Matching",
   "description": "Match bank receipts and payments to invoices with confidence, deductions and exceptions.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "websiteUrl": "https://saifs.ai",
   "repository": {
     "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
@@ -13,7 +13,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://payment-reconciliation-mcp-microsoft.saifs.ai/mcp"
+      "url": "https://payment-reconciliation-mcp.saifs.ai/mcp"
     }
   ]
 }
