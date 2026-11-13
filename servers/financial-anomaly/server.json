@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/financial-anomaly",
+  "title": "Financial Fraud & Anomaly Detection",
+  "description": "Flag unusual ledger entries, possible fraud and earnings manipulation for human review.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/financial-anomaly"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://financial-anomaly-mcp.saifs.ai/mcp"
+    }
+  ]
+}
