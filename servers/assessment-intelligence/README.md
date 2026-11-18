@@ -60,6 +60,10 @@ Point it at `https://assessment-intelligence-mcp.saifs.ai/mcp` using the Streama
 | `flag_at_risk_learners` | Students whose mastery / ability trajectory predicts failure — framed as support, not ranking. |
 | `explain_item` | Why an item is good or bad, with its fitted parameters. |
 
+## More detail
+
+What this server is, why a raw percentage is not enough, and how to use each tool are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here’s this mock’s response matrix. Which questions have negative discrimination and should be dropped?”
