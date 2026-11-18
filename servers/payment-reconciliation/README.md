@@ -59,6 +59,10 @@ Point it at `https://payment-reconciliation-mcp.saifs.ai/mcp` using the Streamab
 | `reconciliation_report` | Matched %, unmatched value, ageing of exceptions and ITC at risk. |
 | `suggest_rules` | New matching rules learned from confirmed matches, returned in `rules_snapshot`. |
 
+## More detail
+
+What a match is, why an exact amount is not enough, and how to send the lines are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Match today’s receipts to open invoices”

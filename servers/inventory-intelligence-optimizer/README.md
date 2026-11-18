@@ -55,6 +55,10 @@ Point it at `https://inventory-optimizer-mcp.saifs.ai/mcp` using the Streamable 
 | `inventory_optimizer` | Scores up to about 200 products and 2,500 sales rows: order quantities, reorder points, overstock, cash exposure and a supplier-grouped purchase queue. |
 | `inventory_optimizer_get_engine` | For larger stock books: returns a runnable Python script that does the same analysis locally, so the data never leaves the user's machine. |
 
+## More detail
+
+What an order quantity means, why a fixed reorder level goes stale, and how to send a stock report are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here's our stock report. What should we order this week and how much?”

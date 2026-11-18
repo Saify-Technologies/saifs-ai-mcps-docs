@@ -16,9 +16,9 @@ under the DNS-verified `ai.saifs` namespace.
 | [Lead Intelligence](servers/lead-intelligence) | `ai.saifs/lead-intelligence` | Score leads to identify high-potential prospects and prioritize sales outreach. |
 | [Marketing Intelligence & Optimization](servers/marketing-intelligence) | `ai.saifs/marketing-intelligence` | Channel ROI and budget mix, product bundles, A/B test verdicts and CAC/LTV from marketing data. |
 | [Hiring Fairness & Selection ROI](servers/hiring-fairness) | `ai.saifs/hiring-fairness` | Detect hiring adverse impact and estimate whether a selection method is worth its cost. |
-| [Media Generator — Images, Videos & Audios](servers/media-generator-images-videos) | `ai.saifs/media-generator-images-videos` | Generate marketing images, logos, videos, music and speech for campaigns, products and brand assets. |
+| [Media Generator — Images & Audio](servers/media-generator-images-videos) | `ai.saifs/media-generator-images-videos` | Generate and edit images, music, and speech. |
 | [Synthetic Data — Random User](servers/synthetic-data-random-user) | `ai.saifs/synthetic-data-random-user` | Generate synthetic user data for testing, demos and development without real personal data. |
-| [Indian Railways IRCTC](servers/indian-railways-irctc) | `ai.saifs/indian-railways-irctc` | Look up Indian Railways trains, routes, live running status, station boards and PNR status. |
+| [Indian Railways IRCTC](servers/indian-railways-irctc) | `ai.saifs/indian-railways-irctc` | Look up Indian Railways trains, routes, live running status, and station boards. Information only. |
 | [Scientific Calculator](servers/scientific-calculator) | `ai.saifs/scientific-calculator` | Exact arithmetic, algebra, calculus, physics, chemistry and finance with a checkable formula. |
 | [Procurement & Supplier Selection](servers/procurement-and-supplier-selection) | `ai.saifs/procurement-and-supplier-selection` | Choose and rank suppliers, size orders and classify spend from delivery and purchase data. |
 | [Learning Optimizer](servers/learning-optimizer) | `ai.saifs/learning-optimizer` | Schedule spaced reviews and exam study plans from each learner's forgetting curve. |

@@ -59,6 +59,10 @@ Point it at `https://optimization-solver-mcp.saifs.ai/mcp` using the Streamable 
 | `optimize_transportation` | Min-cost shipping plan from sources, destinations, supply and demand. |
 | `solve_custom_lp` | General LP solver for power users from an objective and constraints. |
 
+## More detail
+
+What a shadow price means, why trying numbers in a spreadsheet is not an optimum, and how to fill a template are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Find the best production mix within capacity”

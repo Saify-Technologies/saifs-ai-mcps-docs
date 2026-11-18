@@ -59,6 +59,10 @@ Point it at `https://quote-pricing-mcp.saifs.ai/mcp` using the Streamable HTTP t
 | `tender_bid` | Friedman/Gates sealed-bid recommendation for tenders. |
 | `win_loss_report` | Win rate and margin by segment, price band and rep team. |
 
+## More detail
+
+What the price range means, why a flat discount leaves margin behind, and how to send closed quotes are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “What price should we quote for this deal?”

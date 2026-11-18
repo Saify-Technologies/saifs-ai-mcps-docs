@@ -54,6 +54,10 @@ Point it at `https://synthetic-mint-mcp.saifs.ai/mcp` using the Streamable HTTP 
 |---|---|
 | `random_users` | Generates the requested number of synthetic user profiles (name, gender, location, email, login, date of birth, phone, picture, nationality). |
 
+## More detail
+
+What a profile contains, why a copy of production is the wrong fixture, and how to ask for a count are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Give me 20 random users to fill our contacts demo screen.”

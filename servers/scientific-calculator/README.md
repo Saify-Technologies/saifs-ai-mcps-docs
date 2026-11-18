@@ -66,6 +66,10 @@ Named handlers cover these domains (symbolic work via SymPy; finance, physics an
 | Chemistry | Molar mass, moles, molarity, dilution, pH, ideal gas law, periodic table (Z = 1–118) |
 | Programmer & dates | Base convert, bitwise, ASCII, date difference, age, leap year |
 
+## More detail
+
+What the formula in the reply means, why the model must call the tool, and which assumptions that formula already states are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Solve 2x² − 5x − 3 = 0 and show the quadratic formula.”

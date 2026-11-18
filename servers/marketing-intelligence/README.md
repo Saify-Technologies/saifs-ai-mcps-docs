@@ -55,6 +55,10 @@ Point it at `https://marketing-analysis-mcp.saifs.ai/mcp` using the Streamable H
 | `marketing_intelligence` | Analyses payloads of up to 200 rows per data array — spend, sales, baskets, A/B tests, adoption, acquisitions, customer revenue — and returns ranked decisions plus channel ROI, budget moves, bundles, test verdicts and unit economics. |
 | `marketing_intelligence_get_engine` | For larger exports (Meta/Google spend, Shopify orders): returns a numpy-only Python script that runs the same analysis locally, so no marketing data reaches the server. |
 
+## More detail
+
+What a channel contribution means, why last-click is not that number, and how to send the exports are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here's our weekly Meta, Google and email spend with sales. Which channel should we scale or cut?”

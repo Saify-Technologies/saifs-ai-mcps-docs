@@ -61,6 +61,10 @@ Point it at `https://collections-optimizer-mcp.saifs.ai/mcp` using the Streamabl
 | `explain_priority` | Why this account and this strategy — for agent trust and audit. |
 | `watch_queue` | Nightly re-score so the morning queue is fresh. |
 
+## More detail
+
+What this queue is, why oldest-first misses the moveable middle, and how each tool stays inside contact rules are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here’s our overdue book. Who should agents work today, and who will likely self-cure?”

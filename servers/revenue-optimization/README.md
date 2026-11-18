@@ -62,6 +62,10 @@ Point it at `https://revenue-optimizer-mcp.saifs.ai/mcp` using the Streamable HT
 | `show_rate_estimate` | Show-up rate by route, day or segment with confidence. |
 | `watch_booking_pace` | Alert when booking pace runs ahead or behind, triggering price moves. |
 
+## More detail
+
+What a protection level means, why a fixed rate leaves perishable capacity mispriced, and how to send a booking curve are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “How many rooms should we overbook?”

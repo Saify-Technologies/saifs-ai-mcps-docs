@@ -55,6 +55,10 @@ Point it at `https://demand-forecaster-mcp.saifs.ai/mcp` using the Streamable HT
 | `demand_forecaster` | Forecasts demand from sales rows (date + quantity is enough; SKU, region, channel and lead time optional) for up to about 200 products and 2,500 rows. Returns forecasts with prediction intervals, the chosen model and its backtest score, and lead-time demand for reordering. |
 | `demand_forecaster_get_engine` | For larger sales files: returns a runnable Python script that produces the same forecasts locally, so the data never leaves the user's machine. |
 
+## More detail
+
+What a forecast contains, why last-year-plus-ten-percent breaks the next decision, and how to send a history are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here's our Tally sales export. How much of each item will we sell over the next 13 weeks?”

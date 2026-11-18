@@ -60,6 +60,10 @@ Point it at `https://mastery-pathing-mcp.saifs.ai/mcp` using the Streamable HTTP
 | `rate_difficulty` | Elo-based item and learner ratings on one scale. |
 | `explain_recommendation` | Why this topic next, with mastery evidence. |
 
+## More detail
+
+What the frontier means, why a linear syllabus is not a path, and how to send a graph are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here’s our syllabus with prerequisites. What should this student study next?”

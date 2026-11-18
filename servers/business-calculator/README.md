@@ -87,6 +87,10 @@ Point it at `https://business-calculator-mcp.saifs.ai/mcp` using the Streamable 
 | `working_capital_days_calculator` | DSO, DPO, DIO, cash conversion cycle, ageing buckets. |
 | `workforce_metrics_calculator` | Attrition, headcount, absenteeism, cost per hire, utilisation. |
 
+## More detail
+
+What this server is, why a model’s usual arithmetic is not enough, and how to use each tool are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “What price gives 25% margin on cost 750?”

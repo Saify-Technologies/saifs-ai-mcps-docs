@@ -70,6 +70,10 @@ Point it at `https://data-cleaning-mcp.saifs.ai/mcp` using the Streamable HTTP t
 | `standardise_values` | Dates, numbers, currency, phones (E.164), GSTIN/PAN, company suffixes, casing. |
 | `validate_rules` | Pass/fail per rule with failing rows. |
 
+## More detail
+
+What this cleaner returns, why a model should not repair the file, and how to use each tool are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Clean this Tally export before you rank my customers.”

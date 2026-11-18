@@ -60,6 +60,10 @@ Point it at `https://route-optimizer-mcp.saifs.ai/mcp` using the Streamable HTTP
 | `route_map` | Map for a finished route. |
 | `explain_route` | Cost breakdown, constraint bindings and savings versus a naive stop order. |
 
+## More detail
+
+What a route is, why a language model cannot order forty stops, and how to send a distance you measured are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here are today’s 40 stops and 6 vans. Build routes that honour delivery windows.”

@@ -59,6 +59,10 @@ Point it at `https://learning-optimizer-mcp.saifs.ai/mcp` using the Streamable H
 | `forgetting_curve` | Fitted decay curve and parameters for one learner-item. |
 | `explain_schedule` | Why this interval: model, evidence and confidence. |
 
+## More detail
+
+What a next-review date means, why a fixed interval wastes the session, and how to send a review are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “This student just missed item 142. When should they review it next, and what’s P(recall) then?”

@@ -55,6 +55,10 @@ Point it at `https://hiring-fairness-mcp.saifs.ai/mcp` using the Streamable HTTP
 | `hiring_fairness` | Analyses up to 5,000 rows of stage counts (or stage/group/selected candidate rows, or anonymous score/outcome pairs) and returns decision cards such as REVIEW THIS STAGE, COMPARE LIKE WITH LIKE, TEST PREDICTS, SET CUTOFF and WORTH THE COST. |
 | `hiring_fairness_get_engine` | For larger ATS exports: returns a numpy-only Python script that aggregates candidate rows to group counts locally and runs the same analysis, so no candidate data reaches the server. |
 
+## More detail
+
+What an impact ratio means, why the funnel needs a like-for-like check, and how to send counts are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here are our applicant and hire counts by stage and gender. Is any stage showing adverse impact?”

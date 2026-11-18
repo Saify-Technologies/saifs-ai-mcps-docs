@@ -55,6 +55,10 @@ Point it at `https://lead-scoring-mcp.saifs.ai/mcp` using the Streamable HTTP tr
 | `lead_pipeline` | Scores up to 500 leads: conversion probabilities, pipeline value at risk, stage outlook, channel attribution, manager decisions (CALL TODAY / PUSH FORWARD / QUALIFY) and a per-lead ledger. Optional touch log and stage history improve the results. |
 | `lead_pipeline_get_engine` | For pipelines over 500 leads: returns a runnable Python script that scores the export locally with no network calls. |
 
+## More detail
+
+What a conversion probability means, why a 0–100 score is not the call list, and how to send a pipeline are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here's our HubSpot lead export. Who should the team call today?”

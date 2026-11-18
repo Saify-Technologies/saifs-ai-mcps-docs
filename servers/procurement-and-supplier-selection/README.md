@@ -55,6 +55,10 @@ Point it at `https://procurement-and-supply-mcp.saifs.ai/mcp` using the Streamab
 | `procurement_supplier_selection` | For up to 1,000 delivery rows, 500 spend items and 60 suppliers: AHP weights, TOPSIS ranking, vendor reliability, EOQ order sizing, Kraljic spend map and a decision record (FOLLOW TENDER RULES, STOP USING, ORDER, NEGOTIATE…). |
 | `procurement_get_engine` | For larger GRN / spend files: returns a runnable numpy-only script that runs the same engine locally, so the data never leaves the user's machine. |
 
+## More detail
+
+What a ranking is, why an unchecked weight fails an audit, and how to send a comparison are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here are last year’s GRNs and spend. Who should we keep, and who should we stop using?”

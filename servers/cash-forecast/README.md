@@ -59,6 +59,10 @@ Point it at `https://cash-forecast-mcp.saifs.ai/mcp` using the Streamable HTTP t
 | `payment_behaviour` | Days-to-pay distribution per customer (and segment for thin history). |
 | `what_if` | Scenarios such as a late customer, delayed supplier, or large order in week 5. |
 
+## More detail
+
+What this server is, why a due-date forecast misses the cash, and how to use each tool are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Will we have enough cash in week 9?”

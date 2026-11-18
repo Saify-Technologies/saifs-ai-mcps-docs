@@ -59,6 +59,10 @@ Point it at `https://financial-anomaly-mcp.saifs.ai/mcp` using the Streamable HT
 | `flag_anomalous_transactions` | Statistical outliers: amounts, round-number bias, duplicate patterns. |
 | `watch_transactions` | Continuous Benford/anomaly monitoring; alert on deviation. |
 
+## More detail
+
+What gets flagged, why a digit test is not a verdict, and how to use each tool are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Flag unusual journal entries this quarter.”

@@ -54,6 +54,10 @@ Point it at `https://code-execution-mcp.saifs.ai/mcp` using the Streamable HTTP 
 |---|---|
 | `execute_code` | Runs allow-listed Python and returns stdout, stderr, exit code, and any PDF written with `fpdf` (`output("name.pdf")`, download link expires in 1 hour). Non-Python is rejected with a one-line warning. |
 
+## More detail
+
+What this sandbox runs, why the host should not guess the number, and how to get stdout or a PDF are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Run Python to compute the mean and standard deviation of this list and print the result.”

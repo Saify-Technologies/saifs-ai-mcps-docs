@@ -55,6 +55,10 @@ Point it at `https://customer-tiering-mcp-latest.saifs.ai/mcp` using the Streama
 | `customer_tiering` | Scores a customer book of up to 500 transaction rows into A/B/C/D tiers (BG/NBD survival model, Gamma-Gamma spend model, tier migration, money layer) and returns decision cards and a per-customer ledger. Cleans customer-name variants before scoring. |
 | `customer_tiering_get_engine` | For books over 500 rows: returns a runnable Python script that scores the file locally, so customer data never reaches the server. |
 
+## More detail
+
+What a tier means, why the call list is ranked in rupees, and how to send a book are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Here's our sales export. Who are our A accounts, and who should we call this week?”

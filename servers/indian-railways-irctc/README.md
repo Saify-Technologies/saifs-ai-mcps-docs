@@ -1,6 +1,6 @@
 # Indian Railways IRCTC
 
-Information-only Indian Railways assistant: find trains between stations (with or without a date), see full routes and stops, live running status, station arrival/departure boards and PNR status. It does not book, pay for or cancel tickets.
+Information-only Indian Railways assistant: train details by number, trains between two station codes, date-based search with classes and availability, the full route, live running status, and a station arrival and departure board. It plans a connection when no usable direct train exists. It does not book, pay, cancel, or check a PNR.
 
 | | |
 |---|---|
@@ -52,19 +52,22 @@ Point it at `https://transport-agent-claude.saifs.ai/mcp` using the Streamable H
 
 | Tool | What it does |
 |---|---|
-| `railway_train_getByNumber` | Train details for a 5-digit train number. |
-| `railway_train_searchByRouteDate` | Trains, classes and availability between two stations on a date (DD-MM-YYYY, up to 60 days ahead). |
-| `railway_train_betweenStations` | Trains between two station codes, no date needed. |
-| `railway_train_route` | Full route and stops of a train. |
-| `railway_train_liveStatus` | Current running status and position of a train. |
-| `railway_station_liveBoard` | Arrivals and departures board for a station. |
-| `railway_train_pnrStatus` | Status of a 10-digit PNR. |
+| `railway.train.getByNumber` | Train details for a 5-digit train number. |
+| `railway.train.searchByRouteDate` | Trains, classes, and availability between two station codes on a date (`DD-MM-YYYY`, up to 60 days ahead). |
+| `railway.train.betweenStations` | Trains between two station codes, with no date. |
+| `railway.train.route` | Full route and stops of a train. |
+| `railway.train.liveStatus` | Current running status and position of a train. |
+| `railway.station.liveBoard` | Arrivals and departures at a station code. |
+
+## More detail
+
+What a station code and a journey date must look like, why a PNR is not looked up here, and how a connection is chosen are in [docs/README.md](docs/README.md).
 
 ## Example prompts
 
-- “Which trains go from Ratlam (RTM) to Mumbai Central (MMCT) on 05-11-2026?”
+- “Which trains go from Ratlam (RTM) to Mumbai Central (MMCT) on 15-12-2026?”
 - “Where is train 12961 right now?”
-- “Check PNR 2832453235.”
+- “What is the full route of train 12961?”
 
 ## Support
 

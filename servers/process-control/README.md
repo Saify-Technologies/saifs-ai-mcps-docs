@@ -58,6 +58,10 @@ Point it at `https://process-monitor-mcp.saifs.ai/mcp` using the Streamable HTTP
 | `set_control_limits` | Compute ±3σ limits from a stable baseline. |
 | `watch_process` | Continuous watch; alert on rule violations. |
 
+## More detail
+
+What an out-of-control point means, why a dashboard threshold is not a control limit, and how to send a series are in [docs/README.md](docs/README.md).
+
 ## Example prompts
 
 - “Is line 3 drifting out of spec?”
