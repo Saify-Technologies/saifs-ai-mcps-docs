@@ -1,157 +1,317 @@
-# Scientific Calculator
-
-[SAIFS AI](https://saifs.ai) (`saifs.ai`) publishes this as a remote MCP server under the registry name `ai.saifs/scientific-calculator`. Each call is one named formula. The reply is the number or the symbolic result, and the formula or method that produced it.
-
-People search for this as a scientific calculator, a quadratic solver, an EMI calculator, a unit converter, or a checked formula for physics and chemistry. The short install page is the [server README](../README.md). This page is what comes back with the number, why the model must call the tool, and which assumptions the formula already states.
-
-| | |
-|---|---|
-| **Registry name** | `ai.saifs/scientific-calculator` |
-| **Endpoint** | `https://scientific-calculator-mcp.saifs.ai/mcp` |
-| **Transport** | Streamable HTTP (remote, nothing to install) |
-| **Auth** | OAuth 2.1 — PKCE (S256) and dynamic client registration |
-| **Publisher** | [SAIFS AI](https://saifs.ai) |
-
-## What it is
-
-School arithmetic, algebra, geometry, statistics, calculus, matrices, units, physics, electrical formulas, chemistry, programmer conversions, dates, and India-shaped finance (simple and compound interest, EMI, SIP, GST, CAGR) each have their own tool. Symbolic algebra, calculus, and matrices are computed with SymPy. Closed-form tools in finance, physics, and chemistry evaluate an explicit formula and return that formula with the number.
-
-The same inputs always give the same answer. Constants are fixed in the handlers: standard gravity `g = 9.80665` unless you override it, the gas constant `R = 0.082057 L·atm/(mol·K)`, the thermochemical calorie `4.184 J`, mechanical horsepower about `745.7 W`, and a Julian year of `365.25` days. A missing input is an error. The tool does not invent a value.
-
-The call is stateless. Nothing is stored, and the server does not build a learner profile. A homework question is a calculation. The reply states the formula. It does not grade the person.
-
-A dated GST or TDS table, margin, and the other invoice formulas live on [Business Calculator: GST, Margin & Everyday Formulas](../../business-calculator/README.md). That server refuses EMI and interest. Those annuities are here. A Python program that prints a result belongs on [Mathematical Code Execution](../../code-execution/README.md).
-
-## Why the model has to call the tool
-
-A language model drops a sign, mixes degrees with radians, invents a GST split, or quotes a derivative it did not compute. The methods themselves are old and public: the quadratic formula, `F = ma`, the annuity EMI, `pH = −log10[H+]`, Simpson’s rule. Each one is a tool, with the units and the edge cases written down, so the host shows a formula a person can check.
-
-The server does not claim every formula in science. It claims the named tools, and the formula string each one returns.
-
-## How to use it
-
-Connect the endpoint in the [install README](../README.md) and sign in when the client asks. Call the tool that matches the formula. Pass units explicitly.
-
-A quadratic call for `2x² − 5x − 3 = 0` comes back with the roots `3` and `−1/2` and the formula `x = (−b ± √(b² − 4ac)) / (2a)`. The leading coefficient must be nonzero. An identity, or an equation that is not quadratic, is rejected.
-
-```json
-{ "a": 2, "b": -5, "c": -3, "variable": "x" }
+```
+# Scientific Calculator — Exact Arithmetic & Domain Formulas MCP
+*Shipped MCP · Host: scientific-calculator-mcp.saifs.ai · Phase: live tool
+server · Pairs with Saifs AI OAuth + GA4*
 ```
 
-An EMI call takes principal, annual rate, and the number of months. The reply is the instalment to two decimal places and the formula
-
-```text
-EMI = P · r · (1 + r)^n / ((1 + r)^n − 1)
+```
+*Classical models: school arithmetic · quadratic / polynomial roots · SymPy
+symbolic calculus · Newton’s laws & Ohm’s law · annuity EMI & compound interest
+· ideal gas law & pH · matrix eigen-decomposition · Newton–Raphson · Simpson’s
+rule*
 ```
 
-where `r` is the monthly rate. When the monthly rate is 0, the instalment is `P / n`. A 20-year loan has an EMI. The month-by-month schedule is capped at 120 rows, so a longer amortisation is the formula and the instalment, not a bank’s full table.
+# `## Problem statement` 
 
-### Arithmetic and scientific expressions
-
-`calculator_basic`, `calculator_percentage`, `calculator_fraction`, `calculator_mixed_fraction`, `calculator_ratio`, `calculator_proportion`, and `calculator_average` cover school arithmetic. `calculator_scientific` parses an expression and evaluates it, so precedence and functions are computed. Trigonometry takes an explicit `angle_unit`, degrees or radians. Logarithms take a base. Roots take an index. Factorial rejects a negative integer. Modulo and reciprocal reject division by zero.
-
-### Algebra
-
-A linear equation is solved for the variable you name. A quadratic requires `a ≠ 0`. Cubics and higher polynomials, systems, inequalities, simplify, factor, and expand are computed. GCD, LCM, a prime check, and prime factors run on the integers you send.
-
-### Geometry, statistics, matrices
-
-Plane figures and solids return area, surface area, or volume from the lengths you send. Statistics select sample or population variance and standard deviation with `variance_type` and `std_type`. Percentiles use nearest rank. Combinations are `n choose r`. Permutations are `nPr`. Binomial probability is the probability mass at `k`. The normal distribution returns the density and the cumulative `Φ(z) = 0.5 (1 + erf(z))`.
-
-Matrices and vectors add, multiply, invert, and return the determinant, the transpose, eigenvalues, eigenvectors, and rank, plus dot product, cross product, magnitude, and a unit vector. A singular matrix or a shape that does not match returns an error.
-
-### Calculus and numerical methods
-
-Derivatives, second derivatives, partial derivatives, integrals, limits (two-sided, left, and right), Taylor and Maclaurin series, critical points, and gradients are symbolic. When a definite integral has no closed form, `calculator_numerical_integral` uses the quadrature you name: Simpson’s rule by default, or the trapezoidal rule, with interval count `n`. A numerical derivative is a central difference.
-
-Newton–Raphson iterates `x ← x − f(x) / f'(x)`, with an analytic derivative when you supply one, and stops on a non-finite value or at the iteration cap. Linear regression fits `y = a + bx` and needs at least two points with `x` not constant. Quadratic regression fits `y = ax² + bx + c`, needs at least three points, and refuses a singular design.
-
-### Units, physics, and electrical
-
-Conversions cover length, weight, area, volume, temperature, time, speed, pressure, energy, and power. The reply names the units it used. Kinematics uses `v = d / t`, `d = vt`, and `a = (v − u) / t`. A zero time is rejected. Newton’s second law is `F = ma`. Work is `W = F d cos θ` with `θ` in degrees and a default of 0. Power is `P = W / t`. Kinetic energy is `½mv²`. Gravitational potential is `mgh`. Momentum is `p = mv`. Density is `ρ = m / V`. Waves use `v = fλ`.
-
-Ohm’s law solves `V = IR` for the one missing quantity. Electrical power uses `P = VI`, `P = I²R`, or `P = V²/R`. Resistor colour codes, series and parallel resistance, capacitors, inductors, a voltage divider, a current divider, and AC reactance are the same pattern: the formula, the SI units, and an error when an input is illegal.
-
-### Finance
-
-Simple interest is `SI = (P × R × T) / 100`. Compound amount is `A = P (1 + r/n)^(nt)`, with the compounding frequency mapped from annual through daily. SIP future value is
-
-```text
-FV = M × [((1 + i)^n − 1) / i] × (1 + i)
+```
+Chat assistants, tutoring apps, finance sites, and engineering tools ask an LLM
+to “just calculate it.” Language models are unreliable at arithmetic, algebra,
+unit conversion, and exam formulas: they drop a sign, mix degrees with radians,
+invent a GST split, or quote a derivative they did not compute. The correct
+methods are old and public — quadratic formula, F = ma, EMI = P r (1+r)^n /
+((1+r)^n − 1), pH = −log10[H+], Simpson’s rule — but wiring every one of them,
+with units, edge cases, and a formula the user can check, is a large surface. An
+LLM cannot be the calculator. It can only call one.
 ```
 
-CAGR is `(Final / Initial)^(1 / Years) − 1`. GST is either added on top or extracted from a tax-inclusive price, at the rate you send. Discount, profit and loss, and percentage change use the inputs you send. Money is rounded to two decimal places. The result is the formula applied to those inputs. It is not a lender’s offer and it will not match a bank schedule past the 120-row cap.
+# `## Solution` 
 
-### Chemistry
+```
+A stateless scientific-calculator MCP. Each call is one named tool, validated
+inputs, a numeric or symbolic result, and the formula or method that produced
+it. The model must not do the maths itself.
+```
 
-Molar mass comes from a formula against a built-in table for atomic numbers 1 through 118. Moles are `n = m / M`. Dilution is `C1 V1 = C2 V2`. pH and pOH use `pH + pOH = 14` and `Kw = 1×10^−14`, which is a dilute aqueous solution near 25 °C. The ideal gas law converts temperature to kelvin and uses the `R` above. Stoichiometry uses the masses and the coefficients you send. Outside those assumptions the number is still the formula, and the reply says which assumption it used.
+```
+*Tool set (v1)* — 169 handlers in saifsai_server_python/tools, registered as MCP
+tools in saifs_ai_mcp.py:
+- Basic — calculator_basic, calculator_percentage, calculator_fraction,
+calculator_mixed_fraction, calculator_ratio, calculator_proportion,
+calculator_average
+```
 
-### Programmer tools and dates
+```
+- Scientific — calculator_scientific(expression), trigonometry, logarithm,
+exponential, power, root, factorial, absolute value, modulo, reciprocal
+- Geometry — triangle, right triangle, circle, rectangle, square, trapezoid,
+parallelogram, polygon, 3D solids, surface area, volume
+- Algebra — linear, quadratic, cubic, polynomial, system of equations,
+inequality, simplify, factor, expand, GCD, LCM, prime check, prime factors
+- Statistics — mean, median, mode, range, variance, standard deviation,
+percentile, quartile, weighted average, combinations, permutations, probability,
+binomial, normal
+- Calculus — derivative, second derivative, partial derivative, integral,
+numerical integral, limit, Taylor series, critical points, gradient, numerical
+derivative
+- Matrix & vector — add, multiply, inverse, determinant, transpose, eigenvalues,
+eigenvectors, rank, dot, cross, magnitude, unit vector
+- Units — length, weight, area, volume, temperature, time, speed, pressure,
+energy, power
+- Physics — speed, distance, acceleration, force, work, power, kinetic energy,
+potential energy, momentum, density, Ohm’s law, electrical power, wavelength,
+frequency, pressure
+- Finance (India-shaped) — simple interest, compound interest, EMI, loan
+schedule, investment, SIP, GST, discount, profit/loss, CAGR, percentage change
+- Electrical engineering — Ohm’s law, power, resistor, colour code,
+series/parallel resistance, capacitor, inductor, voltage divider, current
+divider, AC, reactance
+- Programmer — binary, decimal, hex, octal, bitwise, shifts, base convert,
+ASCII, data-storage units
+```
 
-Base conversion covers binary, decimal, hexadecimal, and octal, plus bitwise operations, shifts, ASCII, and data-storage units. Dates cover a difference, an age, a count of days, a time difference, a leap year, and a weekday. A random number from the calculator is a sample for a fixture. It is not a key.
+```
+- Date & time — date difference, age, days, time difference, leap year, weekday
+- Chemistry — molar mass, moles, molarity, dilution, pH, concentration, gas law,
+stoichiometry, periodic table (Z = 1–118)
+- Advanced — complex numbers, Newton–Raphson, root finding, interpolation,
+linear/quadratic regression, scientific and mathematical constants, random
+numbers
+```
 
-### Prompts
+```
+Symbolic work (equations, calculus, matrices) runs through *SymPy 1.13*. Closed-
+form domain tools (finance, physics, chemistry, units) use explicit formulas in
+```
 
-- “Solve `2x² − 5x − 3 = 0` and show the quadratic formula.”
-- “What is the EMI on a ₹12,00,000 principal at 8.5% for 20 years?”
-- “Differentiate `sin(x²)`, then evaluate the definite integral of `x²` from 0 to 3 with Simpson’s rule.”
-- “Convert 25 °C to kelvin and say which scale you used.”
-- “pH of a solution with `[H+] = 1×10^−3`, and state the 25 °C assumption.”
+```
+the handler and return that formula with the number.
+```
 
-## Tools
+# `## THE ALGORITHMS (implementation guide) ### Arithmetic and scientific expressions` 
 
-Each domain is a set of named tools. Call the one whose formula matches the question.
+```
+calculator_scientific parses an expression and evaluates it with SymPy, so
+operator precedence and functions are the library’s, not the model’s. Trig tools
+take an explicit angle_unit (degrees or radians). Logs take base; roots take
+index. Factorial, modulo, and reciprocal reject the usual illegal inputs
+(negative factorial, divide by zero).
+```
 
-| Domain | What you send | What comes back | Do not use it when |
-|---|---|---|---|
-| Basic and scientific | An expression or the operands, and `angle_unit` for trigonometry | The value and the formula. Illegal factorial, modulo, and reciprocal inputs error | The question is an invoice GST split on a dated rate table. That is the business calculator |
-| Geometry | Lengths of a triangle, circle, rectangle, solid, or polygon | Area, surface area, or volume, with the formula | A length is missing. The tool does not assume one |
-| Algebra | Coefficients or an expression, and the variable | Roots, a simplified or factored form, or GCD, LCM, and factors | The leading coefficient is 0, or the equation is an identity. Those are rejected |
-| Statistics | The observations, and sample or population for variance | Mean, spread, a percentile, or a binomial or normal probability | You want a forecast from a sales history. That is demand forecasting |
-| Calculus | An expression, the variable, and limits or `n` for a numerical integral | A derivative, an integral, a limit, a series, or a Simpson or trapezoidal value | A definite integral has no closed form and you have not asked for a numerical rule |
-| Matrix and vector | The entries | Inverse, determinant, eigenvalues, rank, or a product. A singular or mismatched matrix errors | You need a production plan under constraints. That is the optimization solver |
-| Units | A value and the two units | The converted value and the units used | The unit alias is ambiguous and you have not said which one |
-| Physics and electrical | Mass, length, time, volts, ohms, or the one missing Ohm quantity | The SI result and the formula. Zero time errors | You want a route or a fleet plan |
-| Finance | Principal, rate, time or months, and the GST rate when tax is the question | Interest, EMI, SIP, CAGR, or GST to two decimal places, with the formula. Schedules stop at 120 rows | You want a lender’s contract, a tax opinion, or a dated statutory GST table |
-| Chemistry | A formula, masses, or a concentration | Molar mass, moles, pH, or a gas-law result, with the stated assumption | The solution is not the dilute aqueous case near 25 °C and you need a result outside that model |
-| Programmer and dates | A number, a base, or two dates | The converted value, the weekday, or the difference | You need a cryptographic key. A calculator random value is not one |
+# `### Algebra (closed form via SymPy)` 
 
-## How to read a result
+```
+Linear: solve ax + b = 0 in the chosen variable. Quadratic: ax² + bx + c = 0
+with a ≠ 0; identity and non-quadratic equations are rejected. Cubic and general
+polynomials use SymPy solve / Poly. Systems, inequalities, simplify, factor, and
+expand are the same engine. GCD/LCM and prime factorisation are integer
+algorithms on the supplied numbers.
+```
 
-- **The formula is part of the answer.** Check the number against the expression in the reply.
-- **Units are the ones you named.** Degrees and radians are not mixed. Celsius is converted only when the tool says it converted to kelvin.
-- **An error is the result when the input is illegal.** A zero denominator, a zero time, a negative factorial, a singular matrix, or a singular regression comes back as an error.
-- **Finance is rounded to two decimals.** That rounding, and the 120-row schedule cap, will differ from a bank’s full amortisation.
-- **Chemistry states its model.** Ideal gas, and pH for a dilute aqueous solution near 25 °C, are the models those tools implement.
-- **The server does not grade anyone.** The formula is the whole of the reply that matters.
+# `### Calculus` 
 
-## Data and what this will not do
+```
+Symbolic derivative, second derivative, partials, indefinite/definite integrals,
+limits (two-sided, left, right), Taylor/Maclaurin series, critical points, and
+gradient are SymPy diff, integrate, limit, series, and solve. When a definite
+integral has no closed form, calculator_numerical_integral falls back to a
+quadrature the caller names: *Simpson’s rule* (default) or the *trapezoidal
+rule, with interval count n. Numerical derivative is a **central difference*.
+```
 
-You send numbers, expressions, and matrices. The server processes the request and does not store it. Each user signs in with OAuth. There is no learner profile and no uploaded corpus. Student questions are often from minors. The calculation is not a record about the student.
+# `### Statistics` 
 
-The server will not invent a missing input, will not silently approximate a non-elementary integral, and will not present an EMI as a loan offer. It will not apply a GST rate you did not send. Dated statutory tables stay on the business calculator.
+```
+Sample vs population variance and standard deviation are selected by
+variance_type / std_type. Percentiles use nearest-rank. Combinations and
+permutations are n choose r and nPr. Binomial probability is the PMF at k (or
+the mode the tool supports). Normal distribution uses the PDF and Φ via
+math.erf: cdf = 0.5 (1 + erf(z)).
+```
 
-Privacy policy: https://saifs.ai/privacy_policy
+# `### Linear algebra` 
 
-## Plans
+```
+Matrices and vectors are SymPy Matrix operations: addition, multiplication,
+inverse, determinant, transpose, eigenvalues, eigenvectors, rank, dot product,
+cross product, magnitude, unit vector. Singular or shape-mismatched inputs
+return an error instead of a guessed matrix.
+```
 
-List prices live on the [SAIFS AI](https://saifs.ai) catalog. Depth splits like this:
+# `### Physics and electrical (SI defaults)` 
 
-| Tier | What it covers |
-|---|---|
-| **Free** | Basic arithmetic, percentage, fractions, ratio, average, and unit conversion |
-| **Pro** | Scientific expressions, algebra, statistics, geometry, and date and time |
-| **Business** | Calculus, matrices, physics, electrical, chemistry, finance (EMI, SIP, GST), regression, and Newton–Raphson |
-| **Platform** | A white-label embed for a tutoring or finance product |
+```
+Kinematics: v = d/t, d = vt, a = (v − u)/t. Newton’s second law: F = ma. Work: W
+= F d cos θ (θ in degrees, default 0). Power: P = W/t. Kinetic energy: ½mv².
+Gravitational potential: mgh with g = 9.80665 unless overridden. Momentum p =
+mv. Density ρ = m/V. Ohm’s law solves V = IR for the one missing quantity.
+Electrical power uses P = VI, P = I²R, or P = V²/R. Waves: v = fλ.
+```
 
-The free tier is enough to check arithmetic and a unit conversion, with no sales call.
+# `### Finance` 
 
-## Support
+```
+Simple interest: SI = (P × R × T) / 100. Compound amount: A = P(1 + r/n)^(nt)
+with frequency mapped to periods per year (annual through daily). EMI: P r
+(1+r)^n / ((1+r)^n − 1), and P/n when the monthly rate is 0. SIP future value:
+FV = M × [((1+i)^n − 1) / i] × (1+i). CAGR: (Final/Initial)^(1/Years) − 1. GST
+is add-on or extract-from-inclusive. Money results are rounded to 2 decimal
+places. Loan amortization is capped at 120 schedule rows.
+```
 
-- Install and client setup: [server README](../README.md)
-- Invoice GST, margin, and dated tax tables: [Business Calculator: GST, Margin & Everyday Formulas](../../business-calculator/README.md)
-- A Python program instead of a named formula: [Mathematical Code Execution](../../code-execution/README.md)
-- Website: https://saifs.ai
-- Registry: https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.saifs
-- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
-- Privacy: https://saifs.ai/privacy_policy
+# `### Chemistry` 
+
+```
+Molar mass from a formula against a built-in IUPAC-style table (Z = 1–118).
+Moles n = m/M. Molarity and dilution C1 V1 = C2 V2. pH / pOH with pH + pOH = 14
+and Kw = 1e−14, which assumes a dilute aqueous solution near 25 °C. Ideal gas
+law uses R = 0.082057 L·atm/(mol·K) with temperature converted to kelvin
+internally.
+```
+
+# `### Numerical methods` 
+
+```
+Newton–Raphson iterates x ← x − f(x)/f'(x) with an optional analytic derivative,
+and stops on non-finite values or an iteration cap. Linear regression fits y = a
++ bx (needs ≥ 2 points, non-constant x). Quadratic regression fits y = ax² + bx
+```
+
+```
++ c (needs ≥ 3 points) and refuses a singular design.
+```
+
+```
+*Numerical/data notes:* tools are stateless — no per-user memory of past
+calculations. SymPy is the symbolic dependency (requirements.txt). Constants (g,
+R, thermochemical calorie 4.184 J, mechanical horsepower ≈ 745.7 W, Julian year
+365.25 d) are fixed in the handlers so two calls with the same inputs match.
+```
+
+# `## Pressure test` 
+
+```
+G1 — exactness: a stateless model cannot be trusted to expand a polynomial,
+invert a matrix, or apply Simpson’s rule the same way twice. Native tool calls
+with the formula in the payload are the continuity the model does not have. Safe
+as a calculator: it does not store a learner corpus and it does not compete by
+accumulating private data. G2 — moat: the moat is coverage and checked edge
+cases (degree vs radian, a ≠ 0, zero time, 0% EMI, GST inclusive, singular
+regression), not a data flywheel. Explained formulas are the trust layer. G3 —
+buyer: students, tutors, finance content, and engineering assistants in one
+server; broad rather than one vertical. G4 — compounding: weak. Each call is
+independent, so accuracy does not improve from usage the way a fitted memory
+model does. The asset is the tool surface staying correct. *No numeric score is
+assigned here* — unlike a pre-scored product brief, this file describes the
+server that is already in the repo.
+```
+
+# `## Audience & user profiles` 
+
+```
+Students and tutors (CBSE / JEE-style maths, physics, chemistry), personal-
+finance content (EMI, SIP, GST), electrical and programmer utilities, and any
+assistant that must show a checkable formula.
+```
+
+```
+1. *Tutoring / homework assistant* — calls the matching tool and shows the
+formula with the result, instead of mental arithmetic.
+```
+
+```
+2. *Personal finance page or bot* — EMI, SIP, GST, and CAGR with rupee rounding
+and the annuity formula visible.
+```
+
+```
+3. *Engineering sidekick* — Ohm’s law, dividers, unit conversion, matrices, and
+numerical roots without a second CAS install on the user’s machine.
+```
+
+# `## Where/how to get data & components` 
+
+```
+| Need | Source | Access |
+```
+
+```
+|---|---|---|
+```
+
+```
+| Numbers, expressions, matrices, formulas | The user message or the host app |
+tool arguments |
+```
+
+```
+| Symbolic engine | SymPy 1.13 | requirements.txt |
+```
+
+```
+| Element masses, physical constants | Tables inside the chemistry, physics, and
+constants handlers | in-repo |
+| Identity of the caller | Saifs OAuth (multiplewords.in) via AuthMiddleware |
+bearer token |
+```
+
+```
+| Usage events | GA4 Measurement Protocol (analytics.py) | GA4_MEASUREMENT_ID +
+GA4_API_SECRET |
+```
+
+```
+No review log, item bank, or uploaded corpus. If an input is missing, the tool
+errors; it does not invent a value.
+```
+
+# `## Monetization` 
+
+```
+Capability naturally splits by depth. List prices are not stored in this
+repository; they belong on the Saifs catalog.
+```
+
+```
+- *Free*: basic arithmetic, percentage, fractions, ratio, average, unit
+conversion
+```
+
+```
+- *Pro*: scientific expression, algebra, statistics, geometry, date/time
+- *Business*: calculus, matrices, physics, electrical, chemistry, finance (EMI,
+SIP, GST), regression and Newton–Raphson, API volume
+```
+
+- `*Platform tier*: white-label embed for a tutoring or finance product that does not want to maintain a CAS` 
+
+- `Positioning: “A checked calculator the model must call — formula included, so the answer can be audited.”` 
+
+```
+## India sole-prop notes
+```
+
+```
+GST add/remove, SIP, and EMI are the home wedge: Indian retail finance and
+school maths on one MCP, with INR-style 2-decimal money. Auth and token checks
+go through https://multiplewords.in; the public host is https://scientific-
+calculator-mcp.saifs.ai. Export of the same API to a foreign tutor product is
+ordinary service invoicing. Student questions often come from minors — the
+server does not build a learner profile, but call logs and GA4 events can still
+carry an authenticated user id; keep analytics coarse and do not retain raw
+homework text beyond what the host already stores. Tool copy should state the
+formula, not grade the person.
+```
+
+# `## Risks` 
+
+```
+Models skipping the tool and answering from memory (instructions say to use only
+these tools; hosts still have to enforce that). SymPy edge cases: non-elementary
+integrals, branch cuts, and equations that are identities rather than solutions
+— handlers should error, not approximate silently. Unit aliases (cm vs m,
+Celsius vs Kelvin) and the chemistry assumptions (ideal gas, pH at ~25 °C) will
+be wrong if the caller ignores the stated units. Finance rounding to 2 decimals
+and the 120-row loan cap will not match a bank’s full schedule. Do not claim
+“every formula in science”; ship the named tool list and the formula string each
+handler already returns.
+```
