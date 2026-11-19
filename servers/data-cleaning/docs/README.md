@@ -1,212 +1,205 @@
-# Data Cleaning & Validation for AI Agents
+# 67 · Data Cleaning & Validation for AI Agents: Deterministic Clean-Up, Rule Repair & Agent-Ready Scoring MCP
+**Initial moat: 81/100 (potential 84) · IW-Breadth: 85 · Phase: Wave 8 · Priority P2 · Shared front end for every Saifs MCP** *(upgraded 29 Oct 2026 from 75 with seven added classical methods; see §3B)*
+**Classical models: Fellegi-Holt automatic edit & minimum-change error localisation (1976) · Hot-deck imputation (US Census 1950s; Ford 1983) · EM algorithm (Dempster-Laird-Rubin 1977) · Multiple imputation (Rubin 1987) · Robust outliers: MAD (Hampel 1974), Tukey fences (1977), Benford (1938) · Fellegi-Sunter record linkage (1969) · Levenshtein (1966) / Jaro-Winkler (1989–90) · Soundex (1918) · Relational normalisation (Codd 1970–72) · **Added:** functional dependencies (Codd 1971; Armstrong 1974) · check digits (Luhn 1954; mod-11) · Shannon entropy (1948) & minimum description length (Rissanen 1978) · Mahalanobis distance (1936) & robust MCD / least-median regression (Rousseeuw 1984) · deductive correction of typos and unit slips · Gower distance (1971) · PSI and Kolmogorov-Smirnov drift tests with control charts (Shewhart 1924)**
 
-[SAIFS AI](https://saifs.ai) (`saifs.ai`) publishes this as a remote MCP server under the registry name `ai.saifs/data-cleaning`. It turns a messy export into standardised rows, a change log, a quarantine list, and an agent-ready score. The same rows and the same profile produce the same output, byte for byte.
+## 1. Problem statement
+Agents act on whatever data they're given. Business data is messy:
+- headers like "Party Name" and "Inv Amt"
+- dates in five formats
+- "₹1,250.50", "(80)" and "n/a" in a number column
+- qty × price ≠ amount
+- duplicate customers, blanks and typos
 
-People search for this as data cleaning, data validation, data quality, deduplication, missing-value imputation, outlier detection, schema mapping, ETL cleaning, or data preprocessing. The questions are “clean up this Excel,” “fix this Tally export,” and “is this file ready for the agent.” The short install page is the [server README](../README.md). This page is what gets cleaned, why a model should not clean it, and how to use each tool.
+Garbage in means garbage decisions out. Asking the LLM to clean the data is unreliable:
+- **Repeatability:** "deterministic" LLM settings vary up to 15% across identical runs (Atil et al., 2024).
+- **Accuracy:** LLM cleaning agents' decisions matched across runs only 44–50% of the time, and their repairs were correct about 3% of the time. A rule-based baseline found errors better (Fadlallah, 2026).
 
-| | |
-|---|---|
-| **Registry name** | `ai.saifs/data-cleaning` |
-| **Endpoint** | `https://data-cleaning-mcp.saifs.ai/mcp` |
-| **Transport** | Streamable HTTP (remote, nothing to install) |
-| **Auth** | OAuth 2.1 — PKCE (S256) and dynamic client registration |
-| **Publisher** | [SAIFS AI](https://saifs.ai) |
+Existing MCPs mostly **monitor** or **validate** (Anomalo, SYNQ, Great Expectations) or are hobby-scope cleaners. No hosted, deterministic cleaner with a change log was found on the major marketplaces.
 
-## What it is
+## 2. Solution
+Messy rows plus optional rules in → clean standardised rows, a change log (every edit with its reason and rule), a quarantine list, a missing-value report with ranges, and an **agent-ready score** out. **Same input + same profile → same output, byte for byte.**
 
-Agents act on the file they are given. This server is the step before that. You send rows, an optional target schema, optional rules, and an optional `cleaning_profile` from the last run. You get back:
+**Tool set (v1, alphabetical):**
+- `change_log(run_id)`: every edit (row, field, old → new, rule, method) and a reproducible run hash
+- `clean_dataset(rows, profile, rules)`: one-call pipeline: map → standardise → validate → repair → impute → flag → dedupe
+- `fill_missing(rows, columns, method)`: hot-deck, EM or multiple imputation; values flagged "imputed" with a range
+- `find_duplicates(rows, keys)`: duplicate groups (shares the engine with 66); never merges by itself
+- `fix_errors(rows, rules, field_weights)`: Fellegi-Holt minimum-change repair; changes the fewest, least-reliable fields so every rule passes
+- `flag_outliers(rows, columns)`: robust z (MAD), Tukey fences, Benford screening; flags, never deletes
+- `map_columns(headers, target_schema)`: maps messy headers to standard fields with confidence
+- `profile_data(rows)`: types, formats, missing %, distinct counts, suspected keys, rule suggestions
+- `quality_score(rows, profile)`: 0–100 agent-ready score by dimension (completeness, validity, consistency, uniqueness)
+- `standardise_values(rows, profile)`: dates, numbers, currency, units, phones (E.164), GSTIN/PAN formats, company suffixes, casing
+- `validate_rules(rows, rules)`: pass/fail per rule with failing rows
 
-| Piece | What it is |
-|---|---|
-| `clean_rows` | Standardised rows. Imputed cells are marked imputed. |
-| `change_log` | Every edit: row, field, old value, new value, rule, and method. |
-| `quarantine` | Rows the cleaner would not guess. They are not deleted and they are not silently “fixed.” |
-| `missing_report` | What was missing, and a range where a value was imputed. |
-| `outliers` and `relationship_outliers` | Values, and combinations of values, that sit far from the rest. Flagged. |
-| `duplicate_groups` | Groups that look like the same entity. Nothing is merged unless you decide to merge. |
-| `discovered_rules` | Regularities in the file, with confidence, and the rows that break them. |
-| `drift_report` | How this load differs from the profile of the previous load. |
-| `quality_score` | An agent-ready score from 0 to 100, split by completeness, validity, consistency, and uniqueness. |
-| `run_hash` | A SHA-256 over the input, the profile, and the engine version. |
-| `cleaning_profile` | Mappings, patterns, rules, correction weights, and drift baselines. You store it. The server does not. |
+**Added tools (moat upgrade):**
+- `check_digits(rows, fields)`: validates GSTIN, GTIN/EAN barcodes and other check-digit identifiers (Luhn, mod-11, mod-36); catches typos with no lookup  *(v1)*
+- `compare_loads(profile_prev, rows)`: drift between this load and the last: distribution shift (PSI, KS), new or missing categories, volume drop, format change  *(v2)*
+- `discover_rules(rows)`: finds functional dependencies (e.g. pincode → city, GSTIN prefix → state, SKU → price band) with confidence, and lists violating rows  *(v2)*
+- `fix_typos_units(rows, history)`: detects digit swaps, sign flips and ×10/×100/×1000 or lakh/crore slips against history and rules, and proposes the correction  *(v2)*
+- `infer_patterns(rows, columns)`: learns each column's dominant format (e.g. `AA-9999`, `DD/MM/YYYY`) and flags values that don't fit  *(v1)*
+- `relationship_outliers(rows, column_groups)`: rows whose **combination** of values is abnormal (e.g. amount far off for that qty and SKU), even if each value looks normal  *(v2)*
 
-`clean_dataset` runs the whole pipeline in one call: map headers, standardise values, validate rules, repair, impute, flag, then group duplicates. The other tools are the same steps on their own, when you want one of them and not the rest.
+## 3. THE ALGORITHMS
+### Column mapping
+Score each header against a target-schema dictionary (synonyms + Jaro-Winkler + value-pattern checks, e.g. a column whose values match a GSTIN pattern). Accept above a threshold; otherwise return candidates for confirmation. Confirmed mappings are saved in the caller's `cleaning_profile`.
+### Standardisation (deterministic parsers)
+- Dates: try a fixed ordered list of formats with the locale (India: day-first)
+- Numbers: strip currency and thousands separators; "(80)" → −80; "n/a"/"-" → missing
+- Phones → E.164
+- Names: Unicode normalise, trim, case rules, strip legal suffixes into a separate field
 
-A Tally export of 1,240 rows, in the shape this pipeline returns, can come back as 1,198 clean rows, 31 repairs (each in the log), 11 quarantined rows, and an agent-ready score of 91. Those counts are an example of the summary. Your file produces its own.
-
-The call is stateless. Rows are processed and discarded. There is no lookup against an outside directory and no enrichment. Confirmed mappings and learned rules live in the profile you send back next month, which is why the same client file cleans the same way every time.
-
-Cleaning is a suggestion with an audit trail. The data owner approves what an agent is allowed to use. A score of 100 means the checked dimensions passed. It does not mean every business fact in the file is true.
-
-Once the rows are clean, a customer book can be ranked with [Customer Intelligence & Segmentation](../../customer-intelligence/README.md). Rank the cleaned file, not the raw export.
-
-## Why a model should not clean the file
-
-Headers arrive as “Party Name” and “Inv Amt.” Dates arrive in five formats. A number column contains `₹1,250.50`, `(80)`, and `n/a`. Quantity times price does not equal amount. The same customer appears twice, and a GSTIN is one character off.
-
-Asking a language model to repair that is not repeatable. Identical runs of “deterministic” model settings have varied by as much as 15% (Atil et al., 2024). In a study of cleaning agents, decisions matched across runs only 44–50% of the time, and the repairs were correct about 3% of the time. A rule-based pass found the errors more reliably (Fadlallah, 2026).
-
-This server is that rule-based pass, with the log attached. It does not spend a model call on each cell. The next agent then sees the clean rows and the list of what changed.
-
-## How to use it
-
-Connect the endpoint in the [install README](../README.md) and sign in when the client asks.
-
-Send the rows as they are. Add rules when you know them (`amount = qty × price`, `invoice_date ≤ payment_date`). Add `field_weights` when one column is typed by hand and another comes from a system: the repair changes the less reliable field first. Set `locale` so dates are read day-first for an Indian file. Pass `seed` inside the profile when you want imputation draws fixed. Pass last month’s `cleaning_profile` when you have one.
-
-```json
-{
-  "rows": [
-    {"Party Name": "Acme Pvt Ltd", "Inv Amt": "₹1,250.50", "Qty": "10", "Rate": "100", "Inv Date": "07/11/2026"},
-    {"Party Name": "ACME PRIVATE LIMITED", "Inv Amt": "(80)", "Qty": "2", "Rate": "40", "Inv Date": "n/a"}
-  ],
-  "target_schema": ["customer_name", "amount", "qty", "price", "invoice_date"],
-  "rules": ["amount = qty * price"],
-  "locale": "en-IN",
-  "cleaning_profile": null
-}
-```
-
-Under 30 rows, the run profiles the file and checks rules. It does not pretend a repair or an imputation is identified. Imputation is refused on a column that is more than 40% missing. That column is flagged instead.
-
-### What standardisation does
-
-Indian exports are parsed on purpose.
-
-| Input | Result |
-|---|---|
-| Dates | A fixed order of formats, day-first for an Indian locale. |
-| `₹1,250.50`, `1,23,456` | A decimal number. Lakh and crore grouping is understood. |
-| `(80)` | −80. |
-| `n/a`, `-` | Missing, not zero. |
-| Phone | E.164, so a local mobile becomes `+91…`. |
-| GSTIN, PAN | Format and, for GSTIN, the mod-36 check character. |
-| Company name | Unicode-normalised, trimmed, cased, with a legal suffix lifted into its own field. |
-
-### A repair, and when it stops
-
-`fix_errors` uses Fellegi-Holt (1976). On a row that breaks a rule it changes the smallest weighted set of fields that can make every rule pass. A typed amount is changed before a system quantity when the weights say the amount is less reliable. Forty-six invoices where amount does not equal quantity times price come back with the amount changed and the reason on each row, when the amount is the field the weights mark as least reliable.
-
-`fix_typos_units` tries candidates in a fixed order: an adjacent-digit swap, a sign flip, a factor of 10, 100, or 1,000, then a lakh/crore slip. It accepts a candidate only when that candidate is the only one that passes every rule and sits inside the robust history range. If two candidates pass, the row is quarantined.
-
-Outliers are flagged and left in place. A row is quarantined when the outlier also breaks a rule. `find_duplicates` returns groups. It does not merge them.
-
-### Prompts
-
-- “Clean this Tally export before you rank my customers.”
-- “Check this CRM file: is it ready for the agent?”
-- “Fix rows where amount doesn't equal quantity × price and show what you changed.”
-- “Which GSTINs fail the check character?”
-- “How does this month’s export differ from the profile I saved last month?”
-
-## Tools
-
-| Tool | What you send | What comes back | Do not use it when |
-|---|---|---|---|
-| `change_log` | A `run_id` from a clean you just ran | Every edit and the run hash | You want the rows cleaned. Call `clean_dataset` first |
-| `check_digits` | Rows and the identifier fields | Pass or fail for GSTIN, GTIN/EAN, Luhn, mod-11, and mod-36. A bad check character is a typo | You want the number looked up in a registry. Nothing is enriched. Card numbers are not stored and not echoed |
-| `clean_dataset` | `rows`, optional `profile`, `rules`, `target_schema`, `locale` | Clean rows, the log, quarantine, missingness, outliers, duplicate groups, the score, the hash, and an updated profile | The file has fewer than 30 rows and you expected repairs, or you wanted a prose summary of the sheet |
-| `compare_loads` | This load’s rows and the previous `cleaning_profile` | PSI, a Kolmogorov-Smirnov result on numeric columns, new or missing categories, a volume change, a format change | You have no saved profile. The first load has nothing to drift from |
-| `discover_rules` | Rows | Functional dependencies with confidence, and the rows that violate them. A kept rule has confidence at least 0.95 and support at least 20 | You want those rules applied as repairs immediately. Confirm them into the profile, then repair |
-| `fill_missing` | Rows, columns, and a method | Hot-deck, EM, or multiple imputation (five draws) with each filled cell flagged and a range attached | The column is an identifier, or more than 40% of it is missing. Those are refused |
-| `find_duplicates` | Rows and the keys or fields to compare | Groups that match. Fellegi-Sunter scores with blocking | You want the groups merged automatically |
-| `fix_errors` | Rows, rules, and field weights | The minimum-change repair that makes the rules pass, with each edit explained | You have no rules. Profile and discover first. Uncertain rows are quarantined |
-| `fix_typos_units` | Rows and history or rules | A single accepted correction for a digit swap, a sign, a factor of ten, or a lakh/crore slip | More than one candidate passes. The row is quarantined |
-| `flag_outliers` | Rows and the numeric columns | Robust-z, Tukey, and Benford flags | You want those rows deleted. Flagged rows stay |
-| `infer_patterns` | Rows and columns | The dominant shape of each column (`AA-9999`, `DD/MM/YYYY`) and the values that do not fit | You want the values rewritten. This tool flags them |
-| `map_columns` | Headers and a target schema | A mapping with confidence, or candidates for you to confirm | Confidence is low and you have not confirmed the candidates. Unconfirmed maps are not applied as fact |
-| `profile_data` | Rows | Types, formats, missingness, distinct counts, suspected keys, and rule suggestions | You want the file changed. Profiling only reads |
-| `quality_score` | Rows and a profile | 0–100 by completeness, validity, consistency, and uniqueness | You want a guarantee that the business facts are correct. The score is the checked dimensions |
-| `relationship_outliers` | Rows and column groups | Rows whose combination is abnormal, even when each column looks normal | You want a single-column outlier. That is `flag_outliers` |
-| `standardise_values` | Rows and a profile | Dates, numbers, currency, units, phones, GSTIN/PAN, suffixes, and casing, in canonical form | You want rule repairs. Standardising does not make quantity times price true |
-| `validate_rules` | Rows and rules | Pass or fail per rule, with the failing rows | You want the failures rewritten. That is `fix_errors` |
-
-## The methods
-
-### Headers
-
-Each header is scored against the target schema with synonyms, Jaro-Winkler similarity, and a check of the values (a column of GSTIN-shaped strings is not a phone). A score above the threshold is accepted. Anything else comes back as candidates. A confirmed map is written into the profile you keep.
-
-### Rules and minimum change
-
-Rules are edits such as `amount = qty × price`, `invoice_date ≤ payment_date`, or `age < 15 ⇒ marital_status = never_married`. For a failing row, Fellegi-Holt finds the smallest weighted set of fields that can satisfy all of the rules, then fills those fields from the rule when the rule determines the value, and from imputation when it does not.
-
+### Rule validation and Fellegi-Holt repair
+Rules are linear or logical edits (e.g. `amount = qty × price`; `invoice_date ≤ payment_date`; `age < 15 ⇒ marital = never_married`). For a failing record, find the **smallest weighted set of fields** whose change can satisfy all rules (set-cover over implied edits, solved as a small MIP via the 29 solver). Then fill those fields with values consistent with the rules: derived where a rule determines the value, otherwise imputed. Field weights encode reliability (e.g. typed amounts less reliable than system quantities).
 ### Missing values
-
-Missingness is checked against the other columns so the report can indicate whether it looks missing completely at random or missing at random. Hot-deck copies from the nearest complete donor. Donors are nearest by Gower distance (1971): numeric fields scaled to their range, categorical fields as match or mismatch, ties broken by row order and the seed. EM (Dempster, Laird, and Rubin, 1977) is used for numeric blocks. Multiple imputation (Rubin, 1987), five draws, is what produces a range rather than one filled-in number. Identifier columns are never imputed.
+- **Mechanism check:** missingness vs other columns, to indicate MCAR/MAR
+- **Methods:** hot-deck (donor from the most similar complete record), EM for numeric blocks, multiple imputation (m = 5) to give a range
+- **Never imputed:** identifiers (keys)
 
 ### Outliers
-
-A robust z uses the median and the median absolute deviation (Hampel, 1974):
-
-```text
-robust z = 0.6745 × (x − median) / MAD
-```
-
-A point with robust z above 3.5 is flagged. Tukey fences (1977) are the second view: below Q1 − 1.5 × IQR, or above Q3 + 1.5 × IQR. Benford’s first-digit test (1938) is a screen on amount columns. None of these delete the row.
-
-Combinations use Mahalanobis distance (1936) on a robust centre and covariance (minimum covariance determinant, Rousseeuw, 1984). A row is flagged when that distance passes the 0.999 chi-square cutoff for its dimension. For a ratio such as amount against price times quantity, the residual comes from least-median-of-squares regression. A quantity and an amount can each look ordinary and still be flagged together.
-
-### Patterns, check digits, and discovered rules
-
-Each value is reduced to a shape: letters, digits, and the punctuation kept. The pattern set that minimises description length (Shannon, 1948; Rissanen, 1978) is the column’s dominant format. Values outside it are flagged. Column entropy is the type-confidence score.
-
-Check digits catch a typo with no external lookup. Luhn (1954) is mod-10 for account-style and card-style numbers, and it is validation only. GTIN/EAN uses the barcode mod-10 weights. GSTIN uses the mod-36 check character. A wrong check character is a typing error. The identifier is not completed from a government database.
-
-Functional dependencies (Codd, 1971; Armstrong, 1974) are regularities such as pincode determining city, or a GSTIN prefix determining state. Confidence is one minus the share of violating rows. The search keeps rules at confidence of at least 0.95 with support of at least 20. Violating rows are candidate errors. A rule enters the profile when you confirm it.
-
+Robust z = 0.6745·(x − median)/MAD > 3.5 → flag. Tukey fences (Q1 − 1.5·IQR, Q3 + 1.5·IQR) as a second view. Benford first-digit test per amount column. Outliers are flagged and quarantined only if they also break a rule.
 ### Duplicates
-
-Fellegi-Sunter (1969) scores pairs inside blocks, using string similarity that includes Levenshtein, Jaro-Winkler, and Soundex where the field is a name. The output is groups. The merge is yours.
-
-### Drift
-
-Against the previous profile, each column reports the population stability index:
-
-```text
-PSI = Σ (actual − expected) × ln(actual / expected)
-```
-
-Below 0.10 is stable. From 0.10 to 0.25 is a watch. Above 0.25 is a shift. Numeric columns also get a Kolmogorov-Smirnov test. New and missing categories are listed. Row count is compared with Shewhart limits across the loads whose profiles you have kept.
-
+Fellegi-Sunter scoring with blocking (shared with 66). Output groups only.
 ### Determinism
+- Ordering: stable row ordering; fixed tie-break rules
+- Randomness: seeded randomness for imputation (seed in the profile)
+- Run hash: SHA-256 over input + profile + engine version, so results are reproducible
 
-Row order is stable. Ties break the same way every time. Imputation uses the seed in the profile. The run hash is SHA-256 of the input, the profile, and the engine version. Same input and same profile give the same bytes back.
+## 3B. ADDED MATHS: moat upgrade (75 → 81)
+### Functional-dependency discovery (Codd 1971; Armstrong's axioms 1974)
+For column sets X → Y, measure how often X determines a single Y: confidence = 1 − violating rows / rows. Search levelwise over small left-hand sides (1–2 columns), pruning with Armstrong's axioms. Keep rules with confidence ≥ 0.95 and support ≥ 20. Violating rows become candidate errors, and confirmed rules are saved in the profile.
+### Check digits
+- Luhn (1954) mod-10 for account-style and card-style numbers (validation only; card numbers are never stored or echoed)
+- GTIN/EAN mod-10 weighting for barcodes
+- GSTIN mod-36 check character
+- A wrong check digit means a typo, flagged with zero false positives
 
-## How to read a result
+### Dominant-pattern detection (Shannon 1948; Rissanen 1978)
+Map each value to a shape (A = letter, 9 = digit, punctuation kept). Choose the pattern set that minimises description length: the bits to describe the patterns plus the exceptions. Values outside the chosen patterns are flagged. Column entropy gives a type-confidence score.
+### Relationship outliers (Mahalanobis 1936; Rousseeuw 1984)
+For numeric groups (e.g. qty, amount per SKU): robust centre and covariance via minimum covariance determinant. Distance d² = (x − μ)ᵀ Σ⁻¹ (x − μ). Flag when d² > χ²₀.₉₉₉(p). For ratio relations (amount ≈ price × qty), least-median-of-squares regression residuals.
+### Deductive correction of typos and unit slips
+For a value failing a rule or far from its history, test candidates in fixed order:
+1. adjacent-digit swap
+2. sign flip
+3. ×/÷ 10, 100, 1000
+4. lakh ↔ crore
 
-- **The log is the product.** An edit without a row, a field, an old value, a new value, and a rule is not a result this server returns.
-- **Quarantine means “do not guess.”** Use the original row, or fix it at the source. Do not tell an agent the quarantined value was repaired.
-- **Imputed means estimated.** Read the range. A column that was refused is still missing on purpose.
-- **The score is readiness, not truth.** Completeness, validity, consistency, and uniqueness can all be high while a price in the source system is still the wrong price.
-- **Duplicate groups are candidates.** Merging two customers is a decision. The tool stops at the group.
-- **Drift is against your last profile.** A shift above 0.25 PSI, a new category, or a volume break is a reason to look before the next agent runs.
-- **Under 30 rows,** trust the profile and the rule failures. Do not trust a repaired distribution.
+Accept the **only** candidate that passes all rules and falls inside the robust history range. If several pass, don't fix: quarantine.
+### Gower-distance hot-deck (1971)
+Donor = nearest complete record by Gower distance (range-scaled numeric plus match/mismatch categorical). Ties broken deterministically by record order and seed.
+### Drift between loads (reuses 20 and 33)
+Per column:
+- **PSI:** `Σ (a − e)·ln(a/e)` on fixed bins. Below 0.1 is stable; 0.1–0.25 watch; above 0.25 shift.
+- **KS test** for numeric columns.
+- **New or missing categories.**
+- **Row-count control chart** across loads (Shewhart limits).
 
-## Data and what this will not do
+The previous load's profile comes from the caller's `cleaning_profile`, so no storage is needed on our side.
 
-Personal fields are processed in the request and discarded. Send hashes in place of raw identifiers when the next step does not need the raw value. Card numbers are checked and not written back out. Nothing is enriched from outside. Each user signs in with OAuth. Your own duties under India’s Digital Personal Data Protection Act, the GDPR, or any other law that applies to the export stay with you.
+### Version plan
+| Version | Contents | Moat |
+|---|---|---|
+| v1 (launch) | Core doc-67 tools + `check_digits` + `infer_patterns` | ~77 |
+| v2 | + `discover_rules`, `relationship_outliers`, `fix_typos_units`, `compare_loads`, Gower hot-deck | **~81** (potential 84) |
 
-The server will not silently delete rows, silently merge duplicates, impute a key, or repair a row when more than one correction fits. It will not summarise a document. It will not certify that the cleaned file is true in the world, only that the rules, patterns, and checks you ran are recorded.
+## 4. Pressure test
+- **G1 Substitution (25/30, was 22):** the LLM alone is unreliable (evidence). Rule discovery, multi-column outliers, check digits and deductive unit correction go well beyond a quick sandbox pandas script. Power Query and OpenRefine still need a human to design steps.
+- **G2 Moats (21/25, was 19):** continuity; accumulated per-source profile now carries discovered rules, learned correction weights and **load-to-load drift baselines**; strong witness (change log, run hash); operations.
+- **G3 Business (20/25):** breadth ~85; self-serve; per-row billing; all marketplaces; internal leverage across all Saifs MCPs.
+- **G4 Time (15/20, was 14):** "AI-ready data" priority; EU AI Act Art. 10; each load makes the profile more valuable. **Total 81; potential 84.**
+- **Recurrence:** every load, sync or agent run ✅
 
-Privacy policy: https://saifs.ai/privacy_policy
+## 5. Audience & user profiles
+Agent developers and builders (the main champions), data and analytics engineers, RevOps/CRM admins, finance-ops teams loading Tally/ERP exports, consultants onboarding client data.
+1. **Agent builder:** the agent calls `clean_dataset` on a Tally export before Customer Segmentation (14). 1,240 rows: 1,198 clean, 31 repaired (each logged), 11 quarantined; agent-ready score 91.
+2. **Finance-ops lead:** "amount ≠ qty × price" on 46 invoices, fixed by changing the typed amount (lowest reliability), with the reason shown per row.
+3. **Consultant:** the same `cleaning_profile` reused every month for a client gives identical cleaning each time.
 
-## Plans
+## 6. Data & components (stateless contract)
+**Input JSON:** `rows[{...}]` (any columns), optional `target_schema`, `rules[]`, `field_weights{}`, `cleaning_profile` (from the last run), `locale`, `seed`.
+**Output JSON:** `clean_rows`, `change_log[]`, `quarantine[]`, `missing_report`, `outliers[]`, `relationship_outliers[]`, `discovered_rules[]`, `drift_report`, `duplicate_groups[]`, `quality_score`, `run_hash`, updated `cleaning_profile` (now holding rules, patterns, correction weights and drift baselines).
+Nothing stored. No outside lookups or enrichment. Math: NumPy, SciPy, OR-Tools (29) for Fellegi-Holt, shared matching engine (58/66). Large files: a `get_engine` script runs locally (same pattern as built MCPs).
+**Refusal thresholds:** imputation refused for columns with > 40% missing (flagged); < 30 rows → profiling and rules only.
 
-| Tier | What it covers |
+## 7. Monetization
+- Free: 5,000 rows/month
+- Pro ₹2,500/$29 mo: 200,000 rows, profiles, rules, change log
+- Business ₹8,300/$99 mo: 5M rows, Fellegi-Holt repair, multiple imputation, duplicate groups, multi-source profiles
+- **Included free (capped) with every Saifs maths MCP** as the input stage; upsell for standalone volume
+
+## 8. India notes & risks
+Handles Indian formats: day-first dates, ₹ and lakh/crore separators, +91 phones, GSTIN/PAN patterns, Tally export quirks, transliteration variants in names. **DPDP:** personal fields processed in-request only, optional hashing, nothing stored, no enrichment. Risks:
+- **Wrong repair:** minimum-change plus weights, every edit logged, uncertain rows quarantined.
+- **Over-imputation:** ranges, flags, refusal threshold.
+- **"Just use pandas" objection:** sell on determinism, change log, agent-ready score and token cost.
+
+Disclaimer: cleaning suggestions with a full audit trail; the data owner approves use.
+
+---
+
+## LISTING & DISCOVERABILITY
+*Keep this section current. It drives marketplace search, AI tool selection and the buying decision.*
+
+**Who discovers this MCP:** agent developers, developers and agent builders. They hit the garbage-in problem first and **champion the purchase**.
+
+### 1. Names
+| Field | Use this | Rule |
+|---|---|---|
+| **Listing title** | **Data Cleaning & Validation for AI Agents — Saifs AI** | Capability keyword first |
+| **Tagline** (for the budget owner) | Turn messy exports into clean, consistent data your agents can trust, with every change logged | Plain business words |
+| **Server / connector ID** | `saifs-data-cleaning` | Lowercase, hyphenated |
+| **Internal code name** | Data Cleaning & Validation (doc 67) | Docs and code only |
+
+### 2. Description: the first 160 characters decide the click
+1. **Developer contract:** messy rows (JSON) → clean rows, change log, quarantine list and an agent-ready quality score; same input gives the same output.
+2. **Business value:** stops garbage-in, garbage-out before agents act; cleaning runs in milliseconds with no LLM tokens.
+3. **Methods:** Fellegi-Holt minimum-change repair, automatic rule discovery (functional dependencies), check digits, multi-column outliers (Mahalanobis), multiple imputation, load-to-load drift detection.
+4. **Trust:** stateless; nothing stored; never silently changes or deletes data.
+
+### 3. Keywords
+- **Developer search terms:** data cleaning, data validation, data quality, deduplication, missing value imputation, outlier detection, schema mapping, column mapping, ETL cleaning, AI-ready data, data preprocessing, data drift detection, rule discovery, gstin validation, data observability
+- **Business phrases:** "clean up this Excel", "fix messy Tally export", "standardise dates and amounts", "is this data ready for the agent"
+- **Method terms:** Fellegi-Holt, multiple imputation, EM, MAD, Tukey, Benford, Fellegi-Sunter, Jaro-Winkler
+- **Platform terms:** MCP server, Copilot Studio connector, Agentforce action, Breeze agent tool, Gemini Enterprise, Amazon Bedrock AgentCore, Claude connector
+
+### 4. Tools as shown in the listing (alphabetical)
+`change_log` · `check_digits` · `clean_dataset` · `compare_loads` · `discover_rules` · `fill_missing` · `find_duplicates` · `fix_errors` · `fix_typos_units` · `flag_outliers` · `infer_patterns` · `map_columns` · `profile_data` · `quality_score` · `relationship_outliers` · `standardise_values` · `validate_rules`
+
+**Tool-description rule:**
+- Start with a verb and the business noun.
+- Name the input fields.
+- Say what comes back.
+- Say when **not** to use the tool, e.g. "don't use for free-text summarisation."
+
+### 5. Example prompts
+- "Clean this Tally export before you rank my customers"
+- "Check this CRM file: is it ready for the agent?"
+- "Fix rows where amount doesn't equal quantity × price and show what you changed"
+
+### 6. Categories per marketplace
+| Marketplace | Category / tags |
 |---|---|
-| **Free** | 5,000 rows a month |
-| **Pro** | ₹2,500 / $29 per month — 200,000 rows, profiles, rules, and the change log |
-| **Business** | ₹8,300 / $99 per month — 5 million rows, Fellegi-Holt repair, multiple imputation, duplicate groups, and multi-source profiles |
-| **With a SAIFS AI maths server** | A capped volume of cleaning is included as the input stage |
+| Microsoft (Copilot Studio certified connector / AppSource) | Data & Analytics; IT & Management; AI + Machine Learning |
+| Salesforce AgentExchange | Data / Platform |
+| AWS Marketplace: AI Agents & Tools | Data → Data quality & preparation |
+| Google Cloud Marketplace / Gemini Agent Gallery | Data analytics / Data quality |
+| HubSpot Marketplace (Breeze) | Operations / Data sync & quality |
 
-The free tier is enough to clean one export and read the log with no sales call. Current terms are on [saifs.ai](https://saifs.ai).
+### 7. Developer try-it kit
+- Free tier, under 10 minutes to first result
+- Sample messy Tally, Excel and HubSpot files plus the cleaned output and change log
+- Copy-paste example call and response
+- 60–90 s demo: messy file → agent calls `clean_dataset` → clean data plus log → Customer Segmentation runs on it
+- Docs, MCP/OpenAPI schema, privacy policy, terms
 
-## Support
+### 8. Champion kit
+- **Business case:** cleaning before agents act prevents wrong decisions; it is deterministic and auditable, and it costs milliseconds instead of thousands of LLM tokens per run. Cite the research (Atil 2024; Fadlallah 2026) and Gartner's AI-ready-data point.
+- **Security:** stateless, nothing stored, per-user OAuth, DPDP/GDPR-friendly
+- **Price:** free tier first, then Pro and Business
 
-- Install and client setup: [server README](../README.md)
-- After the export is clean, rank the customers: [Customer Intelligence & Segmentation](../../customer-intelligence/README.md)
-- Website: https://saifs.ai
-- Registry: https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.saifs
-- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
-- Privacy: https://saifs.ai/privacy_policy
+### 9. Don'ts
+- Coined names in titles
+- "100% accurate" or "fixes everything" claims
+- Implying it silently corrects data (it logs and quarantines)
+- Enrichment from outside sources

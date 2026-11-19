@@ -1,169 +1,208 @@
-# Mastery Pathing
+# 36 · Mastery Pathing — Knowledge Graph & Learning-Sequence MCP
+**Score: 79/100 · IW-Breadth: 45 · Phase: NEW (education, high-moat) · Completes the ed-suite with 25+35**
+**Classical models: Knowledge Space Theory (Doignon-Falmagne, 1985) · Bayesian Knowledge Tracing (Corbett-Anderson, 1994) · Elo/Glicko rating (1978/1995) · Learning Factors Analysis (Cen-Koedinger, 2006) · Prerequisite-graph / topological sequencing**
 
-[SAIFS AI](https://saifs.ai) (`saifs.ai`) publishes this as a remote MCP server under the registry name `ai.saifs/mastery-pathing`. It answers what this learner should study next: the prerequisite structure of the subject, their mastery of each topic, and a sequence that respects both.
+## Problem statement
+Adaptive-learning products need to answer: "what should THIS learner study NEXT?" — which requires modeling (a) the *structure* of the subject (which concepts are prerequisites for which), (b) the learner's current *mastery* of each, and (c) the optimal *sequence* to advance them. Knowledge Space Theory (1985) and knowledge tracing (1994) solve this; leading platforms (Math Academy, Khan) run on exactly this math. But it's genuinely hard — a prerequisite graph + per-skill mastery model + pathing algorithm — so most ed-tech ships linear content or crude "you got 3 wrong, try again." An LLM can't hold per-learner mastery state across a knowledge graph or compute optimal paths.
 
-People search for this as adaptive learning, a learning path, knowledge space theory, a prerequisite graph, personalized learning, or mastery learning. The question is “what should the student learn next.” The short install page is the [server README](../README.md). This page is what the frontier means, why a linear syllabus is not a path, and how to send a graph.
+## Solution
+A knowledge-graph + mastery-tracking + next-best-topic engine ed-tech products call per learner.
 
-| | |
-|---|---|
-| **Registry name** | `ai.saifs/mastery-pathing` |
-| **Endpoint** | `https://mastery-pathing-mcp.saifs.ai/mcp` |
-| **Transport** | Streamable HTTP (remote, nothing to install) |
-| **Auth** | OAuth 2.1 — PKCE (S256) and dynamic client registration |
-| **Publisher** | [SAIFS AI](https://saifs.ai) |
+**Tool set (v1):**
+- `build_knowledge_graph(topics, prerequisites)` → validated prerequisite DAG (cycle detection, gap flags)
+- `estimate_mastery(learner, responses)` → per-skill mastery via BKT/Elo across the graph
+- `next_best_topic(learner)` → the "knowledge frontier": what they're ready to learn now (unlocked prerequisites, not yet mastered)
+- `diagnose_gaps(learner, target_topic)` → prerequisite gaps blocking a goal + remediation path
+- `optimal_sequence(learner, goal)` → topological path from current state to goal, mastery-aware
+- `rate_difficulty(item_responses)` → Elo-based dynamic item/learner rating on one scale
+- `explain_recommendation(learner)` → why this topic next + mastery evidence
 
-## What it is
+## THE ALGORITHMS (implementation guide)
+### Knowledge Space Theory (Doignon-Falmagne 1985)
+Represents a domain as a knowledge structure: which sets of concepts are "learnable states"; the *outer fringe* of a learner's current state = what they're ready to learn. The "knowledge frontier" concept.
+### Prerequisite graph + topological sort
+DAG of concept dependencies; topological ordering gives valid learning sequences; a learner's frontier = topics whose prerequisites are all mastered. `networkx` for DAG ops.
+### Bayesian Knowledge Tracing (Corbett-Anderson 1994)
+Per-skill HMM (P-init, P-learn, P-slip, P-guess) updating P(mastered) after each response — same engine as doc 25, applied across the graph. OSS `pyBKT`.
+### Elo/Glicko for adaptive difficulty (Doebler 2015 multivariate)
+Rate learner ability and item difficulty on ONE scale, updating both after each response — a lighter, real-time alternative to full IRT for pathing. `R_new = R + K(actual − expected)`.
+### Learning Factors Analysis (Cen-Koedinger 2006)
+Improves the cognitive model by discovering which skills a task actually exercises.
+**Notes:** the knowledge graph is partly authored (customer's curriculum) + partly learnable from data (LFA). The mastery state store + graph = the moat. OSS: `networkx`, `pyBKT`.
 
-You send the curriculum. Topics, the prerequisite links you authored, a pseudonymous learner id, and the responses since last time. You may also send the `mastery_snapshot` this server returned on the previous call. You get back mastery per topic, the knowledge frontier, the next topic, the gaps in front of a goal, a path, and a new snapshot to store.
+## Pressure test
+G1 (28/30): per-learner mastery across a knowledge graph + optimal pathing = deep state + hard computation, far beyond a stateless interpreter. Native ✅ safe. G2 (20/25): moats 4 (mastery data + refined knowledge graph accumulate) + 3 (continuous per-learner state) + 5 (explained pathing). G3 (16/25): ed-tech platform buyer — focused, but this is the *core engine* they'd otherwise build. G4 (15/20): graph + mastery corpus compound. **Total 79.**
 
-The curriculum stays yours. The server reasons over the graph you send and does not keep a copy to hand to anyone else.
+## Audience & user profiles
+Adaptive-learning platforms, intelligent tutoring systems, test-prep with large curricula, corporate skills-training platforms, universities building adaptive courses.
+1. **Adaptive math/coding platform** — our engine IS their "what next" brain (like Math Academy's, without building it).
+2. **Test-prep with a big syllabus** — diagnoses each student's gaps and sequences remediation.
+3. **Corporate skills platform** — maps employee skill gaps to learning paths.
 
-Seven tools cover that loop.
+## Where/how to get data & components
+| Need | Source | Access |
+|---|---|---|
+| Curriculum/prerequisites | Customer's content structure | authoring UI / upload |
+| Response data | Customer app → API | integration |
+| Math | `networkx`, `pyBKT`, Elo (OSS) | pip; we harden |
 
-| Tool | What you ask |
-|---|---|
-| `build_knowledge_graph` | Is this prerequisite list a valid order, or does it contain a cycle or a hole? |
-| `estimate_mastery` | What is P(mastered) on each topic, from these responses? |
-| `next_best_topic` | What are they ready for now: prerequisites met, topic not yet mastered? |
-| `diagnose_gaps` | Which missing prerequisites block this goal, and in what order should they be filled? |
-| `optimal_sequence` | What is a valid path from here to the goal? |
-| `rate_difficulty` | Where do this learner and this item sit on one difficulty scale? |
-| `explain_recommendation` | Why this topic, and which responses support it? |
+## Monetization
+- **Free**: knowledge graph (≤50 topics) + basic mastery
+- **Pro ₹8,200/$99 mo**: BKT mastery, next-best-topic, gap diagnosis, larger graphs
+- **Business ₹24,900/$299 mo**: full pathing engine, Elo adaptivity, LFA, large learner base
+- **Platform tier**: per-MAU, white-label — ed-tech embeds it as their core engine (highest revenue)
+- Positioning: "the adaptive-learning brain (Math Academy-style) as an API — don't build a learning-science team."
 
-The call is stateless. The snapshot is yours. The next call sends it back, and `responses` can be only the new ones. A snapshot from a different `model_version` is refused. Learner ids are pseudonymous. Do not send a name, an age, or a school.
+## India sole-prop notes
+Minor learner data → DPDP + child-safety (per doc 25/35). Large Indian adaptive-ed-tech market; INR pricing. Curriculum IP stays the customer's; our engine is the reasoning layer. Export invoicing under LUT.
 
-For the same curriculum, a path that follows prerequisites is associated with reaching mastery in on the order of 20–40% less time than working the syllabus in a fixed line. That is a range across courses, not a promise for one learner. The recommendation says what to learn next. It does not say the learner is weak, and it is not a leaderboard.
+## Risks
+Minor-data care (consent, support-framing); knowledge-graph authoring friction (guided templates + LFA-assisted discovery); cold-start mastery (Elo works fast, BKT needs data — honest ramp); over-claiming pedagogical outcomes (cite research, measure).
 
-Two neighbouring servers answer the other two questions. Whether the questions are sound, and what ability they measure, is [Assessment Intelligence](../../assessment-intelligence/README.md). When to review an item so it is not forgotten is [Learning Optimizer](../../learning-optimizer/README.md).
+---
 
-## Why the next chapter is often the wrong one
+## THE EDUCATION SUITE (docs 25 + 35 + 36 together)
+Three high-moat, math-model education MCPs forming a complete stack — each hard-to-build (the difficulty IS the moat), each serving the large Indian + global ed-tech/test-prep/L&D market:
+- **25 Assessment Intelligence** (IRT/BKT) — *evaluate*: are the questions good, what's the learner's ability?
+- **35 Learning Optimizer** (spaced repetition) — *retain*: when should they review to not forget?
+- **36 Mastery Pathing** (knowledge graph/BKT/Elo) — *sequence*: what should they learn next?
+Sold as the **"Adaptive Learning Engine"** suite — the three math brains ed-tech companies otherwise spend years and learning-science teams building. Bundle pricing mirrors doc 23's Decision-Math suite model. Scores 79–80 each; combined, a genuinely defensible education-infrastructure play.
 
-A subject is a graph. Adding fractions waits on fraction basics. A linear course can still assign adding fractions to someone who has not mastered the basics, and it can hold someone on basics they already have. Knowledge Space Theory (Doignon and Falmagne, 1985) names the learnable states and the outer fringe: the topics just outside what the learner already knows. Bayesian Knowledge Tracing (Corbett and Anderson, 1994) updates P(mastered) after each response. A topological order of the prerequisite graph is a sequence that does not teach an effect before its cause.
+---
 
-Holding that graph and that mastery between sessions is the part a chat model cannot do. Your app holds the snapshot. This server is the update.
+## BUILD PLAN (added 18 October 2026 — now in progress)
 
-## How to use it
+### Architecture: stateless, like the rest of the portfolio
+We do not store learner data. Mastery state is per-learner and long-lived, so the **caller holds it**:
+- The caller sends the knowledge graph + the learner's response history (or our previously returned `mastery_snapshot`).
+- We compute, return an updated `mastery_snapshot` blob, and discard everything.
+- Next call, the caller sends the snapshot back. They keep the memory; we keep the math.
+This keeps minors' data off our servers entirely — the strongest possible answer to DPDP and to ed-tech security reviews.
 
-Connect the endpoint in the [install README](../README.md) and sign in when the client asks.
-
+### Input contract (v1)
 ```json
 {
   "graph": {
-    "topics": [
-      {"id": "frac_add", "name": "Adding fractions"},
-      {"id": "frac_basics", "name": "Fraction basics"}
-    ],
-    "prerequisites": [
-      {"topic": "frac_add", "requires": "frac_basics"}
-    ]
+    "topics": [{"id":"frac_add","name":"Adding fractions"},
+               {"id":"frac_basics","name":"Fraction basics"}],
+    "prerequisites": [{"topic":"frac_add","requires":"frac_basics"}]
   },
-  "learner_id": "L-2041",
+  "learner_id": "pseudonymous-id-only",
   "responses": [
-    {"topic": "frac_basics", "item": "q12", "correct": true, "ts": "2026-10-17T10:02:00Z"},
-    {"topic": "frac_basics", "item": "q15", "correct": false, "ts": "2026-10-17T10:05:00Z"}
+    {"topic":"frac_basics","item":"q12","correct":true,"ts":"2026-10-17T10:02Z"},
+    {"topic":"frac_basics","item":"q15","correct":false,"ts":"2026-10-17T10:05Z"}
   ],
   "mastery_snapshot": null,
   "goal_topic": "frac_add",
   "params": {"mastery_threshold": 0.95}
 }
 ```
+`mastery_snapshot` optional; `responses` may be only the new ones since the last snapshot.
 
-On two responses, a result looks like this. Fraction basics is still learning, P(mastered) about 0.71. The frontier is fraction basics. The next topic is fraction basics, because it is a prerequisite of the goal and it is not mastered. The path is fraction basics, then adding fractions. The confidence note says the estimate is Bayesian Knowledge Tracing on two responses and will sharpen. Store `mastery_snapshot` and `model_version`. Send them next time.
-
-`build_knowledge_graph` is the check to run before any learner call. A cycle is named, not silently broken. A topic that requires a topic you did not define is flagged as a gap in the graph, which is an authoring error, not a learner gap.
-
-### Prompts
-
-- “What should this learner study next?”
-- “Path to master fractions.”
-- “Find gaps blocking algebra.”
-- “Here’s our syllabus with prerequisites. What should this student study next?”
-- “They want to reach quadratic equations. Which gaps are blocking that, and in what order should we remediate?”
-- “Build a learning sequence from their current mastery to the chapter on recursion.”
-
-## Tools
-
-| Tool | What you send | What comes back | Do not use it when |
-|---|---|---|---|
-| `build_knowledge_graph` | Topics and prerequisite links | A validated directed acyclic graph, or the cycle named, plus links that point at a missing topic | You want a learner’s next topic. The graph has no learner in it |
-| `diagnose_gaps` | The graph, a learner snapshot or responses, and a goal topic | The unmastered prerequisites that block the goal, and a remediation order | The goal is already on the frontier. That is `next_best_topic` |
-| `estimate_mastery` | The graph, responses, and an optional snapshot | P(mastered) and a status per topic, plus how many responses support each estimate | You want the path. Mastery is the evidence. The path is `optimal_sequence` |
-| `explain_recommendation` | The learner and the recommendation just made | Why this topic, with the mastery evidence and the response count | You have not asked for a next topic yet |
-| `next_best_topic` | The graph, the learner’s snapshot or responses, and an optional goal | The frontier topic to study now. With a goal, that is the unmastered ancestor with the lowest mastery | You want the full path to a distant goal. That is `optimal_sequence` |
-| `optimal_sequence` | The graph, the current mastery, and a goal | A topological path through the unmastered prerequisites to the goal | The graph has a cycle. Fix it with `build_knowledge_graph` first. A cycle has no valid order |
-| `rate_difficulty` | Item responses: item id, correct or not, and the learner | An Elo rating for the learner and for the item, on one scale | You want P(mastered) of a topic. Elo is the fast rating. Topic mastery is `estimate_mastery` |
-
-## The methods
-
-### The frontier
-
-A topic is on the knowledge frontier when every prerequisite is mastered and the topic itself is not. That is the outer fringe in Knowledge Space Theory. `next_best_topic` picks from that fringe. If you named a goal, the pick is restricted to topics that stand between the learner and the goal, lowest mastery first, so the work moves toward the goal instead of sideways into an unlocked but unrelated topic.
-
-Mastery uses the threshold you send. The example uses 0.95. An estimate under the threshold, or backed by fewer responses than the minimum, stays “learning.” The server does not declare mastery to make a path look finished. The confidence note carries the response count.
-
-### The graph
-
-Prerequisites must form a directed acyclic graph. A topological sort is a legal teaching order: no topic appears before something it requires. `optimal_sequence` is that order, restricted to the unmastered prerequisites of the goal. `diagnose_gaps` is the same set, named as the blockers.
-
-### Bayesian Knowledge Tracing
-
-Each topic is a small hidden Markov model. The defaults, overridable per topic, are:
-
-| Parameter | Default | Meaning |
-|---|---|---|
-| P(L0) | 0.30 | Probability the topic was already mastered before the first response |
-| P(T) | 0.10 | Probability of learning it on an opportunity where it was not yet mastered |
-| P(G) | 0.20 | Probability of a correct answer without mastery |
-| P(S) | 0.10 | Probability of a wrong answer despite mastery |
-
-A parameter set with P(G) + P(S) at or above 1 is rejected. Guessing and slipping that large make a correct answer uninformative. After each response the posterior P(mastered) updates. Two responses leave a wide estimate. The note says so. The same tracing, used to read a test rather than to choose the next topic, is what [Assessment Intelligence](../../assessment-intelligence/README.md) applies to an assessment.
-
-### Elo
-
-For a cold start, and for picking an item inside a topic, learner ability and item difficulty share one scale. After a response,
-
-```text
-R_new = R + K · (actual − expected)
+### Output contract (v1)
+```json
+{
+  "mastery": [{"topic":"frac_basics","p_mastered":0.71,"status":"learning"}],
+  "frontier": ["frac_basics"],
+  "next_best_topic": {"topic":"frac_basics","why":"prerequisite of goal, not yet mastered"},
+  "gaps_to_goal": ["frac_basics"],
+  "path_to_goal": ["frac_basics","frac_add"],
+  "mastery_snapshot": "<opaque blob — caller stores it>",
+  "model_version": "mp-1.0.0",
+  "confidence_note": "BKT on 2 responses; estimate will sharpen with more"
+}
 ```
 
-Actual is 1 or 0. Expected is the logistic of the gap between the learner’s rating and the item’s. Both ratings move. Elo settles from the first answers. It is not a substitute for the topic posterior once there are enough responses for Bayesian Knowledge Tracing. `rate_difficulty` is this scale. It does not by itself choose the next topic.
+### Build order (≈3–4 weeks)
+| Week | Deliverable | Detail |
+|---|---|---|
+| 1 | **Graph engine** | Validate prerequisite DAG; cycle detection with the offending cycle named; topological sort; frontier computation (topics whose prerequisites are all mastered and which are not yet mastered) |
+| 1–2 | **BKT engine** | Per-topic Bayesian Knowledge Tracing; default parameters (P(L0)=0.3, P(T)=0.1, P(G)=0.2, P(S)=0.1) with per-topic overrides; reject degenerate params (P(G)+P(S) ≥ 1) |
+| 2 | **Pathing** | `next_best_topic` (frontier ∩ ancestors of goal, lowest mastery first); `diagnose_gaps`; `optimal_sequence` as topological path through unmastered prerequisites |
+| 3 | **Elo difficulty** | Learner and item ratings on one scale; used for item selection within a topic and as a fast cold-start signal before BKT has data |
+| 3 | **Snapshot round-trip** | Versioned, signed snapshot blob; reject tampered or wrong-version snapshots |
+| 4 | **Golden tests + MCP wiring** | Benchmark file tests T36.1 (BKT posterior 0.65853659 → next 0.69268293) and T36.2 (Elo 1520.48208), plus invariants; tool descriptions; entitlement |
 
-Learning Factors Analysis, on the Business tier, checks whether an item actually exercises the topic you attached it to. A mismatch is a curriculum correction, not a judgment of the learner.
+### Reuse
+- BKT is shared with doc 25 (Assessment Intelligence) — build it once as a shared module.
+- Survival/state-tracking discipline and refusal thresholds follow doc 14.
+- Doc 35 (Learning Optimizer) later adds *when to review*; Mastery Pathing decides *what to learn next*. Together with 25 they form the Adaptive Learning Engine.
 
-## How to read a result
+### Guardrails (non-negotiable)
+- **Pseudonymous IDs only** — no names, ages or school details in the payload; say so in the tool description.
+- **Support framing** — outputs describe what to learn next, never rank or label children ("weak student"). No leaderboards.
+- **Honest confidence** — report how many responses back each mastery estimate; refuse to declare mastery below a minimum response count.
+- **Graph is the customer's** — curriculum and prerequisites are their IP; we reason over it, never redistribute it.
 
-- **The frontier is permission, not a grade.** Prerequisites are met. The topic is not mastered yet. That is why it is next.
-- **Read the response count** before you treat P(mastered) as stable. “BKT on 2 responses” means the number will move.
-- **A named cycle is an authoring fix.** Do not ask for a path until the graph is acyclic.
-- **Gaps are topics, not people.** The remediation list is what to teach next on the way to the goal.
-- **Status stays “learning”** until the threshold and the minimum count are both met. Do not rewrite that as a label on the child.
-- **Store the snapshot.** The following call without it refits from whatever responses you send, and a snapshot stamped with another model version is refused.
+### First customer path
+Sell to ed-tech platforms and coaching institutes as an embedded engine (per-learner-per-month or per-MAU), not to individual students. Pilot with one test-prep or K-12 platform using a single subject graph (e.g. Class 8 maths) before broadening.
 
-## Data and what this will not do
+---
 
-Responses are personal data, and in school and test prep they are often data of minors. Send a pseudonymous id and the graph. Do not send names, ages, or school details. The server computes, returns the snapshot, and discards the request. Each user signs in with OAuth. Consent and the decision to hold the snapshot stay with the app. Your duties under India’s Digital Personal Data Protection Act, the GDPR, or any other law that applies stay with you. The graph is your curriculum. It is not republished.
+---
 
-The server will not rank learners, will not call a learner weak, and will not declare mastery from a handful of answers. It will not invent a prerequisite you did not write. It will not break a cycle quietly. It will not tell you when to review. That is the learning optimizer. It will not tell you whether the item is a fair measure of the topic. That is assessment intelligence.
+## LISTING & DISCOVERABILITY
+*Keep this section current. It drives marketplace search, AI tool selection and the buying decision.*
 
-Privacy policy: https://saifs.ai/privacy_policy
+**Who discovers this MCP:** agent developers, developers and agent builders (Copilot Studio makers, Agentforce, Breeze and Gemini Enterprise builders, Claude/ChatGPT connector users). They find it, test it, and **champion the purchase** to the budget owner. Every field below is written for them first, with a business tagline the manager can understand.
 
-## Plans
+### 1. Names
+| Field | Use this | Rule |
+|---|---|---|
+| **Listing title** | **Adaptive Learning Path Engine — Saifs AI** | Capability keyword first; ≤ 60 characters before "— Saifs AI" |
+| **Tagline** (for the budget owner) | The next topic each learner should study based on prerequisites | Plain business words; ≤ 90 characters |
+| **Server / connector ID** | `saifs-learning-path` | Lowercase, hyphenated, no coined words |
+| **Internal code name** | Mastery Pathing (doc 36) | Docs and code only, **never** in a listing |
 
-| Tier | What it covers |
+### 2. Description: the first 160 characters decide the click
+1. **Developer contract:** Topic graph + responses (JSON) → mastery map, next topics, path to goal.
+2. **Business value (for the champion):** Time to mastery cut 20–40%.
+3. **Methods (specialist search and credibility):** uses Knowledge Space Theory, BKT, Elo.
+4. **Trust:** stateless; data is processed in the request and never stored; per-user OAuth sign-in. Child-data care; pseudonymous IDs.
+
+### 3. Keywords
+- **Developer search terms (title, description, tags):** adaptive learning, learning path, knowledge space theory, prerequisite graph, personalized learning, mastery learning
+- **Business phrases (tagline, FAQ, tool descriptions):** "what should the student learn next"
+- **Method terms (description body):** Knowledge Space Theory, BKT, Elo
+- **Platform terms (only where actually listed):** MCP server, Copilot Studio connector, Agentforce action, Breeze agent tool, Gemini Enterprise, Amazon Bedrock AgentCore, Claude connector, ChatGPT app
+
+### 4. Tools as shown in the listing (alphabetical)
+`build_knowledge_graph` · `diagnose_gaps` · `estimate_mastery` · `explain_recommendation` · `next_best_topic` · `optimal_sequence` · `rate_difficulty`
+
+**Tool-description rule:** the AI picks tools from these descriptions, so they count as discoverability too.
+- Start with a verb and the business noun.
+- Name the input fields.
+- Say what comes back.
+- Say when **not** to use the tool.
+
+### 5. Example prompts (listing, demo video, tool descriptions)
+- "What should this learner study next?"
+- "Path to master fractions"
+- "Find gaps blocking algebra"
+
+### 6. Categories per marketplace
+| Marketplace | Category / tags |
 |---|---|
-| **Free** | A knowledge graph of up to 50 topics, and basic mastery |
-| **Pro** | ₹8,200 / $99 per month — Bayesian Knowledge Tracing, the next topic, gap diagnosis, and larger graphs |
-| **Business** | ₹24,900 / $299 per month — the full path, Elo difficulty, a check that items match their topics, and a large learner base |
-| **Platform** | Ed-tech products that embed the path engine, priced per monthly active user, with a white-label option |
+| Microsoft (Copilot Studio certified connector / AppSource) | Education; Analytics |
+| Salesforce AgentExchange | Education |
+| AWS Marketplace: AI Agents & Tools | Industry → Education |
+| Google Cloud Marketplace / Gemini Agent Gallery | Education |
+| HubSpot Marketplace (Breeze) | Service |
 
-The free tier is enough to validate a small syllabus and see a frontier, with no sales call. Current terms are on [saifs.ai](https://saifs.ai).
+### 7. Developer try-it kit (ship with the listing)
+- Free tier that works in under 10 minutes, no sales call
+- Sample JSON payload shaped like a real export from: LMS, assessment data
+- One copy-paste example call **and** its response
+- A 60–90 second demo video: prompt → tool call → answer
+- Link to the docs and the MCP/OpenAPI schema; privacy policy and terms
 
-## Support
+### 8. Champion kit (for the developer to forward upward)
+- **One-line business case:** Time to mastery cut 20–40%. Always as a range, never a bare number.
+- **Security note:** stateless, nothing stored, per-user OAuth, DPDP/GDPR-friendly
+- **Price:** the tier table from §Monetization, with the free tier stated first
 
-- Install and client setup: [server README](../README.md)
-- Whether the items measure the topic: [Assessment Intelligence](../../assessment-intelligence/README.md)
-- When to review so the topic is retained: [Learning Optimizer](../../learning-optimizer/README.md)
-- Website: https://saifs.ai
-- Registry: https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.saifs
-- Issues: https://github.com/Saify-Technologies/saifs-ai-mcps-docs/issues
-- Privacy: https://saifs.ai/privacy_policy
+### 9. Don'ts
+- Coined names (e.g. "Mastery Pathing") in titles or tags
+- "Best", "#1" or "guaranteed" claims
+- Bare money figures
+- Promises beyond the guardrail: Child-data care; pseudonymous IDs
