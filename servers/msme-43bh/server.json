@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/msme-43bh",
+  "title": "MSME 45-Day Payment & 43B(h) Checker",
+  "description": "Set due dates for MSME bills, a pay-by list, and the §43B(h) year-end disallowance.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/msme-43bh"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://msme-43bh-mcp.saifs.ai/mcp"
+    }
+  ]
+}

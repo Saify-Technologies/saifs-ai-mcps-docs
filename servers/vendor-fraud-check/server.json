@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.saifs/vendor-fraud-check",
+  "title": "Vendor Bank-Detail Fraud Checker",
+  "description": "Flag risky vendor bank changes, invalid identifiers and shared accounts before payment.",
+  "version": "1.0.0",
+  "websiteUrl": "https://saifs.ai",
+  "repository": {
+    "url": "https://github.com/Saify-Technologies/saifs-ai-mcps-docs",
+    "source": "github",
+    "subfolder": "servers/vendor-fraud-check"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://vendor-fraud-check-mcp.saifs.ai/mcp"
+    }
+  ]
+}
